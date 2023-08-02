@@ -28,4 +28,4 @@ function start(port){
     app.listen(port , ()=> console.log(`up and running on port ${port}`))
 }
 
-module.exports = start
+module.exports = {start,app}
