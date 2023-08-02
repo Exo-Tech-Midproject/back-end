@@ -1,7 +1,9 @@
 'use strict';
 
 const base64 = require('base-64');
-const { physician } = require('../../models');
+
+const models = require('../../models')
+
 
 module.exports = async (req, res, next) => {
 
@@ -12,14 +14,21 @@ module.exports = async (req, res, next) => {
     let basic = req.headers.authorization.split(' ').pop();
     let [user, pass] = base64.decode(basic).split(':');
 
+
+    const schema = models[req.params.model]
+    console.log(schema)
     try {
-    req.user = await physician.model.authenticateBasic(user, pass)
-    next();
+        req.user = await schema.model.authenticateBasic(user, pass)
+        next();
     } catch (e) {
-    _authError()
+        _authError()
+
         console.log(e)
     }
 
     function _authError() {
-    res.status(403).send('Invalid Login');
-}}
+
+        res.status(403).send('Invalid Login');
+    }
+}
+
