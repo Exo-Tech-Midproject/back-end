@@ -3,7 +3,6 @@
 const { Router } = require("express");
 
 class MethodCollection {
-
     constructor(model) {
       this.model = model;
     }
@@ -33,6 +32,3 @@ class MethodCollection {
   }
   
   module.exports = MethodCollection;
-
-
- 
