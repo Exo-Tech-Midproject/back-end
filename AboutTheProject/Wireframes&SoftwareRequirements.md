@@ -6,7 +6,7 @@
 
 ## User Stories
 
-**Title: User Registration** q
+**Title: User Registration** 
 
 *As a potential user, I want to register on the healthcare platform to access personalized health profiles and connect with my healthcare provider.*
 
