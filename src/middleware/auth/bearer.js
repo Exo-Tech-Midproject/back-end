@@ -7,7 +7,6 @@ module.exports = async (req, res, next) => {
   try {
 
     if (!req.headers.authorization) { _authError() }
-console.log(req.headers.authorization)
     const schema = models[req.params.model]
 
     const token = req.headers.authorization.split(' ').pop();

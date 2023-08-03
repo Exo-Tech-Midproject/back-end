@@ -1,20 +1,31 @@
 'use strict'
 
 const bcrypt = require('bcrypt');
-
+const jwt = require('jsonwebtoken');
+const SECRET = process.env.SECRET || '123';
 function handelPhysicianSchema (sequelize , DataTypes){
     let physician = sequelize.define('Physician',{
         username:{
-            type:DataTypes.STRING,
+            type:DataTypes.STRING(24),
             allowNull:false,
             unique:true
         },
+        token: {
+            type: DataTypes.VIRTUAL,
+            get() {
+                return jwt.sign({ username: this.username }, SECRET);
+            },
+            set(tokenObj) {
+                let token = jwt.sign(tokenObj, SECRET);
+                return token;
+            }
+        },
         fullName:{
-            type:DataTypes.STRING,
+            type:DataTypes.STRING(255),
             allowNull:false,
         },
         password:{
-            type:DataTypes.STRING,
+            type:DataTypes.STRING(30),
             allowNull:false,
             unique:true
         },
@@ -24,7 +35,7 @@ function handelPhysicianSchema (sequelize , DataTypes){
             unique:true
         },
         gender:{
-            type:DataTypes.STRING,
+            type:DataTypes.ENUM('male','female'),
             allowNull:false,
         },
         birthday:{
@@ -38,12 +49,15 @@ function handelPhysicianSchema (sequelize , DataTypes){
         },
         accountType:{
             type:DataTypes.STRING,
-            default:'physician'
+            defaultValue:'physician'
         },
         emailAddress:{
             type:DataTypes.STRING,
             allowNull:false,
-            unique:true
+            unique:true,
+            validate:{
+                isEmail:true
+            }
         },
         nationalID:{
             type:DataTypes.STRING,
@@ -68,6 +82,16 @@ function handelPhysicianSchema (sequelize , DataTypes){
         const valid = await bcrypt.compare(password, user.password);
         if (valid) { return user; }
         throw new Error('Invalid User');
+    };
+    physician.authenticateToken = async function (token) {
+        try {
+            const parsedToken = jwt.verify(token, SECRET);
+            const user = await this.findOne({ where: { username: parsedToken.username } });
+            if (user) { return user; }
+            throw new Error("User Not Found");
+        } catch (e) {
+            throw new Error(e.message)
+        }
     };
     return physician;
 }

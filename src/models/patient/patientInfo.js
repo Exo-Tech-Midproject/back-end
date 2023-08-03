@@ -7,7 +7,7 @@ const SECRET = process.env.SECRET || '123';
 function handlePatientSchema(sequelize, DataTypes) {
     let patient = sequelize.define('Patient', {
         username: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(24),
             allowNULL: false,
             unique: true
         },
@@ -22,11 +22,11 @@ function handlePatientSchema(sequelize, DataTypes) {
             }
         },
         fullName: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(255),
             allowNULL: false
         },
         password: {
-            type: DataTypes.STRING,
+            type: DataTypes.STRING(30),
             allowNULL: false
         },
         insurance: {
@@ -34,7 +34,7 @@ function handlePatientSchema(sequelize, DataTypes) {
             allowNULL: true
         },
         gender: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('male','female'),
             allowNULL: false
         },
         birthdate: {
@@ -42,11 +42,11 @@ function handlePatientSchema(sequelize, DataTypes) {
             allowNULL: false
         },
         race: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('hispanic','non-hispanic','asian','african-american','american-indian','white','native-hawaiian'),
             allowNULL: false
         },
         maritalStatus: {
-            type: DataTypes.STRING,
+            type: DataTypes.ENUM('single','married'),
             allowNULL: false
         },
         mobileNumber: {
@@ -61,7 +61,10 @@ function handlePatientSchema(sequelize, DataTypes) {
         emailAddress: {
             type: DataTypes.STRING,
             allowNULL: false,
-            unique: true
+            unique: true,
+            validate:{
+                isEmail:true
+            }
         },
     })
     patient.beforeCreate(async (user) => {
@@ -75,10 +78,8 @@ function handlePatientSchema(sequelize, DataTypes) {
         throw new Error('Invalid User');
     };
     patient.authenticateToken = async function (token) {
-        console.log('user')
         try {
             const parsedToken = jwt.verify(token, SECRET);
-            console.log(parsedToken)
             const user = await this.findOne({ where: { username: parsedToken.username } });
             if (user) { return user; }
             throw new Error("User Not Found");

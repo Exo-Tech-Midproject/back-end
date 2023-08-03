@@ -3,28 +3,33 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const morgan = require('morgan');
 
 // require('dotenv').config();
-const patientRouter = require('./routes/patientRoute/patientRoute')
-const physicianRouter = require('./routes/physicianRoutes/physicianRoutes');
-// const morgan = require('morgan');
-const router = express.Router();
-
-router.param
+const userRouter = require('./routes/userRouter/userRouter');
 const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
 
+// const patientRouter = require('./routes/patientRoute/patientRoute')
+// const physicianRouter = require('./routes/physicianRoutes/physicianRoutes');
 
-
-
+// using libraries ------------------------------------
 
 app.use(express.json())
 app.use(cors())
-// app.use(morgan())
-app.use(patientRouter);
-app.use(physicianRouter)
+app.use(morgan('dev'))
 
-// Catchalls
+
+// using routes ------------------------------------
+
+// app.use(patientRouter);
+// app.use(physicianRouter)
+app.use(userRouter)
+
+
+
+
+// ErrorHandlers ------------------------------------
 app.use(notFound);
 app.use(errorHandler);
 
