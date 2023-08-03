@@ -3,12 +3,12 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET || '123';
-function handelPhysicianSchema (sequelize , DataTypes){
-    let physician = sequelize.define('Physician',{
-        username:{
-            type:DataTypes.STRING(24),
-            allowNull:false,
-            unique:true
+function handelPhysicianSchema(sequelize, DataTypes) {
+    let physician = sequelize.define('Physician', {
+        username: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
         },
         token: {
             type: DataTypes.VIRTUAL,
@@ -20,56 +20,56 @@ function handelPhysicianSchema (sequelize , DataTypes){
                 return token;
             }
         },
-        fullName:{
-            type:DataTypes.STRING(255),
-            allowNull:false,
+        fullName: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
-        password:{
-            type:DataTypes.STRING(30),
-            allowNull:false,
-            unique:true
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
         },
-        licenseId:{
-            type:DataTypes.INTEGER,
-            allowNull:false,
-            unique:true
+        licenseId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            unique: true
         },
-        gender:{
-            type:DataTypes.ENUM('male','female'),
-            allowNull:false,
+        gender: {
+            type: DataTypes.ENUM('male', 'female'),
+            allowNull: false,
         },
-        birthday:{
-            type:DataTypes.DATEONLY,
-            allowNull:false,
+        birthday: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
         },
-        mobileNumber:{
-            type:DataTypes.STRING,
-            allowNull:false,
-            unique:true
+        mobileNumber: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
         },
-        accountType:{
-            type:DataTypes.STRING,
-            defaultValue:'physician'
+        accountType: {
+            type: DataTypes.STRING,
+            defaultValue: 'physician'
         },
-        emailAddress:{
-            type:DataTypes.STRING,
-            allowNull:false,
-            unique:true,
-            validate:{
-                isEmail:true
+        emailAddress: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isEmail: true
             }
         },
-        nationalID:{
-            type:DataTypes.STRING,
-            allowNull:false,
-            unique:true
+        nationalID: {
+            type: DataTypes.STRING,
+            allowNull: false,
+            unique: true
         },
-        department:{
-            type:DataTypes.STRING,
-            allowNull:false,
+        department: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
-        address:{
-            type:DataTypes.STRING,
+        address: {
+            type: DataTypes.STRING,
         }
     })
 

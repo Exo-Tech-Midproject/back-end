@@ -34,7 +34,7 @@ function handlePatientSchema(sequelize, DataTypes) {
             allowNULL: true
         },
         gender: {
-            type: DataTypes.ENUM('male','female'),
+            type: DataTypes.ENUM('male', 'female'),
             allowNULL: false
         },
         birthdate: {
@@ -42,11 +42,11 @@ function handlePatientSchema(sequelize, DataTypes) {
             allowNULL: false
         },
         race: {
-            type: DataTypes.ENUM('hispanic','non-hispanic','asian','african-american','american-indian','white','native-hawaiian'),
+            type: DataTypes.ENUM('hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian'),
             allowNULL: false
         },
         maritalStatus: {
-            type: DataTypes.ENUM('single','married'),
+            type: DataTypes.ENUM('single', 'married'),
             allowNULL: false
         },
         mobileNumber: {
@@ -62,8 +62,8 @@ function handlePatientSchema(sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNULL: false,
             unique: true,
-            validate:{
-                isEmail:true
+            validate: {
+                isEmail: true
             }
         },
     })
