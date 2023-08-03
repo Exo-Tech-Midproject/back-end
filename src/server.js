@@ -9,6 +9,8 @@ const morgan = require('morgan');
 const userRouter = require('./routes/userRouter/userRouter');
 const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
+const qaRoutes = require('./routes/qaRoute/qaRoute');
+const physQaRouter = require("./routes/qaRoute/physQaRoute")
 
 // const patientRouter = require('./routes/patientRoute/patientRoute')
 // const physicianRouter = require('./routes/physicianRoutes/physicianRoutes');
@@ -25,7 +27,8 @@ app.use(morgan('dev'))
 // app.use(patientRouter);
 // app.use(physicianRouter)
 app.use(userRouter)
-
+app.use(qaRoutes)
+app.use(physQaRouter)
 
 
 
