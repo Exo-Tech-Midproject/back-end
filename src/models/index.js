@@ -13,7 +13,7 @@ const physicianModel = require('./physician/physicianInfo')
 
 
 const sequelize = new Sequelize(DBURL)
-const physician = physicianModel(sequelize, DataTypes);
+let physician = physicianModel(sequelize, DataTypes);
 let patients = patientModel(sequelize, DataTypes);
 
 
