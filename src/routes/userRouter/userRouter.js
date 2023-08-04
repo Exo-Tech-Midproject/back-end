@@ -68,4 +68,13 @@ userRouter.get('/:model/secret',bearerAuth, async (req, res, next) => {
     let users = await req.model.get()
     res.status(200).json(users)
 });
+
+userRouter.get('/signup', (req, res) => {
+    const welcomeMessage = `
+    Welcome to the Signup Page!<br><br>
+    To sign up as a patient, use: <strong>/signup/patient</strong><br>
+    To sign up as a physician, use: <strong>/signup/physician</strong>
+    `;
+    res.send(welcomeMessage);
+});
 module.exports = userRouter;
