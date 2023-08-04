@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET || '123';
 
 function handlePatientSchema(sequelize, DataTypes) {
+
   let patient = sequelize.define('Patient', {
     username: {
       type: DataTypes.STRING(24),
@@ -105,6 +106,7 @@ function handlePatientSchema(sequelize, DataTypes) {
   };
 
   return patient;
+
 }
 
 module.exports = handlePatientSchema;

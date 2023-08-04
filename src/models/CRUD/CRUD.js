@@ -3,6 +3,7 @@
 const { Router } = require("express");
 
 class MethodCollection {
+
     constructor(model) {
       this.model = model;
     }
@@ -47,6 +48,22 @@ class MethodCollection {
       return this.model.destroy({ where: { username }});
     }
   
+
   }
-  
-  module.exports = MethodCollection;
+
+  create(record) {
+    return this.model.create(record);
+  }
+
+  update(username, data) {
+    return this.model.findOne({ where: { username } })
+      .then(record => record.update(data));
+  }
+
+  delete(id) {
+    return this.model.destroy({ where: { id } });
+  }
+
+}
+
+module.exports = MethodCollection;

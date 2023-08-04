@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET || '123';
 
+
 function handlePhysicianSchema(sequelize, DataTypes) {
   let physician = sequelize.define('Physician', {
     username: {
