@@ -35,7 +35,7 @@ class MethodCollection {
         .then(record => record.update(data));
     }
 
-    updatebyUN(username, data) {
+    updateByUN(username, data) {
       return this.model.findOne({ where: { username } })
         .then(record => record.update(data));
     }
@@ -51,19 +51,6 @@ class MethodCollection {
 
   }
 
-  create(record) {
-    return this.model.create(record);
-  }
-
-  update(username, data) {
-    return this.model.findOne({ where: { username } })
-      .then(record => record.update(data));
-  }
-
-  delete(id) {
-    return this.model.destroy({ where: { id } });
-  }
-
-}
+  
 
 module.exports = MethodCollection;

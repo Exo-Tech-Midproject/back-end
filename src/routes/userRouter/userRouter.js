@@ -76,7 +76,7 @@ userRouter.get('/profile/:model/:username', async (req, res) => {
     // console.log(username)
     console.log(req.model.model)
 
-    const userProfile = await req.model.get();
+    const userProfile = await req.model.getByUN(username);
 
     if (!userProfile) {
         return res.status(404).json({ error: 'User not found' });
@@ -90,7 +90,7 @@ userRouter.put('/profile/:model/:username', async (req, res) => {
     const username = req.params.username;
     const obj = req.body;
 
-    let updateProfile = await req.model.update(username, obj);
+    let updateProfile = await req.model.updateByUN(username, obj);
 
     if (!updateProfile) {
         return res.status(404).json({ error: 'Access denied' });
@@ -103,6 +103,7 @@ userRouter.put('/profile/:model/:username', async (req, res) => {
 
 userRouter.get('/', async (req, res, next) => {
     res.status(200).json("Welcome to Home Page")
+})
 
 userRouter.get('/signup', (req, res) => {
     const welcomeMessage = `
