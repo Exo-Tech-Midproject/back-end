@@ -14,14 +14,14 @@ userRouter.param('model', modelMiddleware);
 userRouter.post('/signup/:model', async (req, res, next) => {
     try {
         // req.body.username = req.body.username.toLowerCase()
-    let user = await req.model.create(req.body);
-    const output = {
-        user: user,
-        token: user.token
-    };
-    res.status(201).json(output);
+        let user = await req.model.create(req.body);
+        const output = {
+            user: user,
+            token: user.token
+        };
+        res.status(201).json(output);
     } catch (e) {
-    next(e.message)
+        next(e.message)
     }
 });
 
@@ -33,8 +33,12 @@ userRouter.post('/login/:model', basicAuth, (req, res, next) => {
     res.status(200).json(user);
 });
 
-userRouter.get('/:model/secret',bearerAuth, async (req, res, next) => {
+userRouter.get('/:model/secret', bearerAuth, async (req, res, next) => {
     let users = await req.model.get()
     res.status(200).json(users)
+});
+
+userRouter.get('/', async (req, res, next) => {
+    res.status(200).json("Welcome to Home Page")
 });
 module.exports = userRouter;
