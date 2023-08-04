@@ -28,7 +28,7 @@ afterAll(async () => {
         "fullName": "Tas58eemhassasneh",
         "licenseId": 1122555354753,
         "gender": "female",
-        "birthday": "1996-08-07",
+        "birthDate": "1996-08-07",
         "mobileNumber": "+965478855866690",
         "emailAddress": "eemhassasneh@gmail.com",
         "nationalID": "7885423853",
