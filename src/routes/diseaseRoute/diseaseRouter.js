@@ -236,7 +236,7 @@ diseaseRouter.put('/:model/patients/:username/:modelB', bearerAuth, async (req, 
     if(model !== 'physician') throw new Error('Access Denied')
     let findUser = await patient.getByUN(username);
     if(findUser) {
-        let updateRecords = await req.modelB.updatebyUN(username,req.body);
+        let updateRecords = await req.modelB.updateByUN(username,req.body);
         const output = {
             patientUpdatedRecord: updateRecords
         };
