@@ -10,6 +10,37 @@ const modelMiddleware = require('../../middleware/routerModelling/routerModellin
 
 userRouter.param('model', modelMiddleware);
 
+userRouter.get('/login', (req, res, next) => {
+    const response = {
+        message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
+        forPhysician: {
+            "username":"Your Username",
+            "fullName":"Your fullname",
+            "password":"Yourpassword",
+            "licenseId":"Your licenseID",
+            "gender":"Your gender (male/female)",
+            "birthDate":"Your birthday as (Year-month-day)",
+            "mobileNumber":"Your mobile Number",
+            "emailAddress":"Your Email",
+            "nationalID":"Your National ID",
+            "department":"The department you work in"
+        },
+        forPatient: {
+            "username": "Your Username",
+            "fullName": "Your fullname",
+            "password": "Yourpassword",
+            "gender": "Your gender (male/female)",
+            "birthdate":"Your birthday as (Year-month-day)" ,
+            "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
+            "maritalStatus":"Your maritalStatus as single/married" ,
+            "mobileNumber":"Your mobile Number" ,
+            "emailAddress": "Your Email"   
+          }
+        
+    }
+    
+    res.status(200).json(response);
+});
 
 userRouter.post('/signup/:model', async (req, res, next) => {
     try {
