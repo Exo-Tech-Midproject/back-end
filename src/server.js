@@ -7,6 +7,7 @@ const morgan = require('morgan');
 
 // require('dotenv').config();
 const userRouter = require('./routes/userRouter/userRouter');
+const diseaseRouter = require('./routes/diseaseRoute/diseaseRouter');
 const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
 const qaRoutes = require('./routes/qaRoute/qaRoute');
@@ -27,8 +28,11 @@ app.use(morgan('dev'))
 // app.use(patientRouter);
 // app.use(physicianRouter)
 app.use(userRouter)
+
 app.use(qaRoutes)
 app.use(physQaRouter)
+app.use(diseaseRouter)
+
 
 
 
