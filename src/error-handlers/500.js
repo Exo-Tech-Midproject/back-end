@@ -7,5 +7,6 @@ module.exports = function (err, req, res, next) {
     status: 500,
     message: error
     };
+    console.log(errorObject)
     res.status(500).json(errorObject);
 };
