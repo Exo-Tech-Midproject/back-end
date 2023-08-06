@@ -7,7 +7,7 @@ const Collection = require('./CRUD/CRUD');
 const patientModel = require('./patient/patientInfo')
 const physicianModel = require('./physician/physicianInfo')
 
-
+//---------------------------------------------------------
 
 
 
@@ -16,7 +16,7 @@ const diseaseModel = require('../models/diseaseControl/diseaseControl')
 const prescriptionModel = require('../models/prescriptions/prescriptions')
 
 
-
+//---------------------------------------------------------
 
 
 const sequelize = new Sequelize(DBURL)
@@ -27,17 +27,42 @@ let QuestionAnswer = QuestionAnswerModel(sequelize, DataTypes);
 let diseases = diseaseModel(sequelize, DataTypes);
 let prescriptions = prescriptionModel(sequelize, DataTypes);
 
+//---------------------------------------------------------
+//patient - history relation
+patients.hasOne(diseases,{ as:'History', foreignKey:'patientUN', sourceKey:'username'})
+diseases.belongsTo(patients,{foreignKey:'patientUN', targetKey:'username'})
+
+//patient - prescription relation
+
+patients.hasMany(prescriptions,{ as:'Prescriptions', foreignKey:'patientName', sourceKey:'username'})
+prescriptions.belongsTo(patients,{foreignKey:'patientName', targetKey:'username'})
+
+//physician - history relation
+
+physician.hasMany(diseases, { as: 'HistoryCreated', foreignKey: 'physicianUN', sourceKey: 'username' });
+diseases.belongsTo(physician, { as: 'CreatedBy', foreignKey: 'physicianUN', targetKey: 'username' });
+
+//physician - prescription relation
+
+physician.hasMany(prescriptions, { as: 'PrescriptionsCreated', foreignKey: 'physicianName', sourceKey: 'username' });
+prescriptions.belongsTo(physician, { as: 'PrescribedBy', foreignKey: 'physicianName', targetKey: 'username' });
+
+//physician - patient relation
+
+physician.belongsToMany(patients,{as:'Subscriber', foreignKey:'physiciantUN',through: "subscriptions"})
+patients.belongsToMany(physician,{as: 'Subscription',foreignKey:'patientUN',through: "subscriptions"})
 
 
 
-
+//---------------------------------------------------------
 module.exports = {
     db: sequelize,
     patient: new Collection(patients),
     QuestionAnswer:new Collection(QuestionAnswer),
     physician: new Collection(physician),
     disease: new Collection(diseases),
-    prescription: new Collection(prescriptions)
+    prescription: new Collection(prescriptions),
+    testing: patients
 
 };
     

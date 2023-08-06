@@ -10,7 +10,8 @@ function handlePhysicianSchema(sequelize, DataTypes) {
     username: {
       type: DataTypes.STRING(24),
       allowNull: false,
-      unique: true
+      unique: true,
+      primaryKey:true
     },
     token: {
       type: DataTypes.VIRTUAL,
@@ -27,7 +28,7 @@ function handlePhysicianSchema(sequelize, DataTypes) {
       allowNull: false
     },
     password: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING,
       allowNull: false
     },
     licenseId: {

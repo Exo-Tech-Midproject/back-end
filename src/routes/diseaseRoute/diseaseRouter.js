@@ -193,12 +193,12 @@ diseaseRouter.get('/:model/:username/:modelB', bearerAuth, async (req, res, next
     }
 });
 
-diseaseRouter.get('/:model/patients/:username/:modelB', bearerAuth, async (req, res, next) => {
+diseaseRouter.get('/:model/:physicianUN/patients/:patientUN/:modelB', bearerAuth, async (req, res, next) => {
     try {
         // req.body.username = req.body.username.toLowerCase()
-    let {username,model,modelB} = req.params
+    let {patientUN,model,modelB} = req.params
     if(model !== 'physician') throw new Error('Access Denied')
-    let records = await req.modelB.getByUN(username);
+    let records = await req.modelB.getByUN(patientUN);
     const output = {
         patientRecord: records
     };
@@ -208,14 +208,15 @@ diseaseRouter.get('/:model/patients/:username/:modelB', bearerAuth, async (req, 
     }
 });
 
-diseaseRouter.post('/:model/patients/:username/:modelB', bearerAuth, async (req, res, next) => {
+diseaseRouter.post('/:model/:physicianUN/patients/:patientUN/:modelB', bearerAuth, async (req, res, next) => {
     try {
         // req.body.username = req.body.username.toLowerCase()
-    let {username,model} = req.params
+    let {patientUN,model,physicianUN} = req.params
     if(model !== 'physician') throw new Error('Access Denied')
-    let findUser = await patient.getByUN(username);
+    let findUser = await patient.getByUN(patientUN);
     if(findUser) {
-        req.body.username = username
+        req.body.patientUN = patientUN
+        req.body.physicianUN = physicianUN
         let createRecords = await req.modelB.create(req.body);
         const output = {
             patientCreatedRecord: createRecords
@@ -229,14 +230,15 @@ diseaseRouter.post('/:model/patients/:username/:modelB', bearerAuth, async (req,
     }
 });
 
-diseaseRouter.put('/:model/patients/:username/:modelB', bearerAuth, async (req, res, next) => {
+diseaseRouter.put('/:model/:physicianUN/patients/:patientUN/:modelB', bearerAuth, async (req, res, next) => {
     try {
         // req.body.username = req.body.username.toLowerCase()
-    let {username,model,modelB} = req.params
+    let {patientUN,model,modelB,physicianUN} = req.params
     if(model !== 'physician') throw new Error('Access Denied')
-    let findUser = await patient.getByUN(username);
+    let findUser = await patient.getByUN(patientUN);
     if(findUser) {
-        let updateRecords = await req.modelB.updateByUN(username,req.body);
+        req.body.physicianUN = physicianUN
+        let updateRecords = await req.modelB.updateByUN(patientUN,req.body);
         const output = {
             patientUpdatedRecord: updateRecords
         };

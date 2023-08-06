@@ -1,6 +1,7 @@
 'use strict'
 
 const { Router } = require("express");
+const { testing } = require("../../models/index");
 
 class MethodCollection {
 
@@ -47,9 +48,135 @@ class MethodCollection {
     deleteByUN(username) {
       return this.model.destroy({ where: { username }});
     }
+    getRelatedData(model) {
+      return this.model.findOne({
+        // where:{username},
+        include:[
+          {
+            model: model,
+            as: 'History',
+            attributes: {
+              exclude: ['patientUN','id']
+            }
+          }
+        ],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt','token','password','accountType']
+        }
+      })
+  
+    }
+    getRelatedDataForOne(username,model) {
+      return this.model.findOne({
+        where:{username},
+        include:[
+          {
+            model: model,
+            as: 'Prescriptions',
+            
+          }
+        ],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt','token','password','accountType']
+        }
+      })
+  
+    }
+    getRelatedDataForOnephys(username,model) {
+      return this.model.findOne({
+        where:{username},
+        include:[
+          {
+            model: model,
+            as: 'PrescriptionsCreated',
+            
+          }
+        ],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt','token','password','accountType']
+        }
+      })
+  
+    }
+    getRelatedDataPhysician(model,model2,model3) {
+      return this.model.findAll({
+        // where:{username},
+        include:[
+          {
+            model: model,
+            as: 'HistoryCreated',
+            attributes: {
+              exclude: ['patientUN','id']
+            }
+          }
+        ],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt','token','password','accountType','birthDate','address','nationalID','gender']
+        }
+      })
+  
+    }
+    getRelatedDataOnePhysician(username,model,model2,model3) {
+      return this.model.findOne({
+        where:{username},
+        include:[
+          {
+            model: model,
+            as: 'HistoryCreated',
+            attributes: {
+              exclude: ['id']
+            }
+          }
+        ],
+        attributes: {
+          exclude: ['createdAt', 'updatedAt','token','password','accountType','birthDate','address','nationalID','gender']
+        }
+      })
+  
+    }
+      async getSubscriptionsPatient(username, model, model2, model3) {
+        let usersfound = await this.model.findOne({
+          where: { username },
+        })
+        let record = await usersfound.getSubscription({
+          attributes:{
+            exclude: ['createdAt', 'updatedAt','token','password','accountType','birthDate','address','nationalID','gender']
+          }
+        })
+        return record
+      }
+      async getSubscriptionsPhysician(username, model, model2, model3) {
+        let usersfound = await this.model.findOne({
+          where: { username },
+        })
+        let record = await usersfound.getSubscriber({
+          attributes:{
+            exclude: ['createdAt', 'updatedAt','token','password','accountType','birthDate','address','nationalID','gender']
+          }
+        })
+        return record
+      }
+      // return await this.model.findOne({
+      //   where:{username},
+      //   include:[
+      //     {
+      //       model: model,
+      //       as: 'Subscriber',
+      //       attributes: {
+      //         exclude: ['patientUN','id']
+      //       }
+      //     }
+      //   ],
+      //   attributes: {
+      //     exclude: ['createdAt', 'updatedAt','token','password','accountType','birthDate','address','nationalID','gender']
+      //   }
+      // })
+  
+    }
+    
   
 
-  }
+  
 
   
 
