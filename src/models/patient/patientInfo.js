@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET || '123';
+const models = require('../../models')
 
 function handlePatientSchema(sequelize, DataTypes) {
 
@@ -27,7 +28,7 @@ function handlePatientSchema(sequelize, DataTypes) {
       allowNull: false
     },
     password: {
-      type: DataTypes.STRING(30),
+      type: DataTypes.STRING,
       allowNull: false
     },
     insurance: {
