@@ -5,6 +5,9 @@ const userRouter = express.Router();
 const basicAuth = require('../../middleware/auth/basic')
 const bearerAuth = require('../../middleware/auth/bearer')
 
+
+const { group , physician , patient} = require('../../models')
+
 const models = require('../../models/index')
 const modelMiddleware = require('../../middleware/routerModelling/routerModelling')
 
@@ -35,7 +38,7 @@ userRouter.get('/login', (req, res, next) => {
             "maritalStatus":"Your maritalStatus as single/married" ,
             "mobileNumber":"Your mobile Number" ,
             "emailAddress": "Your Email"   
-          }
+        }
         
     }
     
@@ -107,12 +110,27 @@ userRouter.get('/', async (req, res, next) => {
 
 userRouter.get('/signup', (req, res) => {
     const welcomeMessage = `
-    Welcome to the Signup Page!<br><br>
-    To sign up as a patient, use: <strong>/signup/patient</strong><br>
-    To sign up as a physician, use: <strong>/signup/physician</strong>
-    `;
+    Welcome to the Signup Page!
+    To sign up as a patient, use: /signup/patient
+    To sign up as a physician, use: /signup/physician`;
     res.send(welcomeMessage);
-
 });
 
+
+userRouter.get('/physicianGroups/:id', physicianGroups);
+userRouter.get('/GroupOfPatients/:id', GroupOfPatients);
+
+async function physicianGroups(req, res) {
+    const id = req.params.id;
+    const physicianGroupsById = await physician.readPhysicianGroups(id, group.model);
+    res.status(200).json(physicianGroupsById)
+}
+
+async function GroupOfPatients(req, res) {
+    const id = req.params.id;
+    const GroupOfPatientsById = await group.readMemberGroups(id, patient.model);
+    res.status(200).json(GroupOfPatientsById)
+}
+
 module.exports = userRouter;
+

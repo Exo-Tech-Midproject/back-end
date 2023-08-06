@@ -48,7 +48,25 @@ class MethodCollection {
       return this.model.destroy({ where: { username }});
     }
   
+    async readPhysicianGroups(id, model) {
+      const records = await this.model.findOne({
+        where: { id },
+        include: model
+      });
+      return records;
+    }
 
+    async readMemberGroups(id, model) {
+      const records = await this.model.findOne({
+        where: { id },
+        include: { 
+          model : model,
+          as : 'Member'
+        }
+
+      });
+      return records;
+    }
   }
 
   

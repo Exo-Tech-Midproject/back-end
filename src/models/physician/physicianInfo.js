@@ -104,6 +104,8 @@ function handlePhysicianSchema(sequelize, DataTypes) {
     }
   };
 
+  // physician.hasMany(group, { foreignKey: 'createdBy' });
+
   return physician;
 }
 

@@ -76,6 +76,10 @@ function handlePatientSchema(sequelize, DataTypes) {
         isEmail: true
       }
     }
+    // groupId:{
+    //   type: DataTypes.INTEGER,
+    //     allowNull: false
+    // }
   });
 
   patient.beforeCreate(async (user) => {

@@ -12,6 +12,7 @@ const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
 const qaRoutes = require('./routes/qaRoute/qaRoute');
 const physQaRouter = require("./routes/qaRoute/physQaRoute")
+const groupRouter = require("./routes/groupsRouter/groupsRouter")
 
 // const patientRouter = require('./routes/patientRoute/patientRoute')
 // const physicianRouter = require('./routes/physicianRoutes/physicianRoutes');
@@ -32,6 +33,7 @@ app.use(userRouter)
 app.use(qaRoutes)
 app.use(physQaRouter)
 app.use(diseaseRouter)
+app.use(groupRouter)
 
 
 
