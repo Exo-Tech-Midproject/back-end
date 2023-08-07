@@ -9,6 +9,6 @@ module.exports = (req, res, next) => {
     req.model = models[modelName];
     next();
   } else {
-    next('Invalid Model,AccessDenied');
+    next('Invalid Model, Access Denied');
   }
 }

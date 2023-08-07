@@ -48,6 +48,7 @@ class MethodCollection {
     deleteByUN(username) {
       return this.model.destroy({ where: { username }});
     }
+
     getRelatedData(model) {
       return this.model.findOne({
         // where:{username},
@@ -177,6 +178,9 @@ class MethodCollection {
   
 
   
+
+  }
+
 
   
 

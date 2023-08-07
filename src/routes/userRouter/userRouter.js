@@ -5,7 +5,7 @@ const userRouter = express.Router();
 const basicAuth = require('../../middleware/auth/basic')
 const bearerAuth = require('../../middleware/auth/bearer')
 
-const models = require('../../models/index')
+const { appointment } = require('../../models/index')
 const modelMiddleware = require('../../middleware/routerModelling/routerModelling')
 
 userRouter.param('model', modelMiddleware);
@@ -14,31 +14,31 @@ userRouter.get('/login', (req, res, next) => {
     const response = {
         message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
         forPhysician: {
-            "username":"Your Username",
-            "fullName":"Your fullname",
-            "password":"Yourpassword",
-            "licenseId":"Your licenseID",
-            "gender":"Your gender (male/female)",
-            "birthDate":"Your birthday as (Year-month-day)",
-            "mobileNumber":"Your mobile Number",
-            "emailAddress":"Your Email",
-            "nationalID":"Your National ID",
-            "department":"The department you work in"
+            "username": "Your Username",
+            "fullName": "Your fullname",
+            "password": "Yourpassword",
+            "licenseId": "Your licenseID",
+            "gender": "Your gender (male/female)",
+            "birthDate": "Your birthday as (Year-month-day)",
+            "mobileNumber": "Your mobile Number",
+            "emailAddress": "Your Email",
+            "nationalID": "Your National ID",
+            "department": "The department you work in"
         },
         forPatient: {
             "username": "Your Username",
             "fullName": "Your fullname",
             "password": "Yourpassword",
             "gender": "Your gender (male/female)",
-            "birthdate":"Your birthday as (Year-month-day)" ,
+            "birthdate": "Your birthday as (Year-month-day)",
             "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
-            "maritalStatus":"Your maritalStatus as single/married" ,
-            "mobileNumber":"Your mobile Number" ,
-            "emailAddress": "Your Email"   
-          }
-        
+            "maritalStatus": "Your maritalStatus as single/married",
+            "mobileNumber": "Your mobile Number",
+            "emailAddress": "Your Email"
+        }
+
     }
-    
+
     res.status(200).json(response);
 });
 
@@ -112,6 +112,47 @@ userRouter.get('/signup', (req, res) => {
     To sign up as a physician, use: <strong>/signup/physician</strong>
     `;
     res.send(welcomeMessage);
+
+});
+//-----------------------------------------------------------------------------
+// Appointment Routes
+
+//add Appointment
+userRouter.post('/profile/:model/:username/appointments', async (req, res) => {
+
+    const username = req.params.username;
+    const user = await req.model.getByUN(username);
+
+    console.log("model", req.params.model)
+
+    if (req.params.model === 'physician') {
+        let appointmentData = req.body;
+        appointmentData.physicianUsername = req.params.username;
+
+        const appointmentInfo = await appointment.create(appointmentData);
+        const output = {
+            appointmentInfo: appointmentInfo
+        };
+        return res.status(201).json(appointmentInfo);
+    } else {
+        return res.status(403).json({ error: 'Access denied' });
+    }
+
+});
+
+//retrieve appointment
+userRouter.get('/profile/:model/:username/appointments', bearerAuth, async (req, res) => {
+    const username = req.params.username;
+    console.log("req.user.params = ", req.user.username)
+    if (req.user.username !== username) {
+        return res.status(403).json({ error: 'Access denied' });
+    }
+
+    const user = await req.model.getByUN(username);
+
+    const appointments = await appointment.model.findAll({ where: { physicianUsername: username } })
+
+    return res.status(200).json(appointments);
 
 });
 
