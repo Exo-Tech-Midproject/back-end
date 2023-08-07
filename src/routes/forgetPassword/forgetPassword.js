@@ -41,13 +41,6 @@ async function sendResetEmail(emailAddress, resetToken) {
 }
 
 //----------------
-
-
-async function hashPassword(password) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    return hashedPassword;
-}
-
 //routes
 
 passwordRouter.post('/forgotpassword/:model/:username', async (req, res, next) => {
