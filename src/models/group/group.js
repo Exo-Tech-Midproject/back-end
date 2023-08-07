@@ -7,8 +7,8 @@ function handleGroupSchema(sequelize, DataTypes) {
         allowNull: false,
         unique: true
     },
-    physicianId:{
-        type: DataTypes.INTEGER,
+    physicianUN:{
+        type: DataTypes.STRING,
         allowNull: false
     }
     // patientId:{

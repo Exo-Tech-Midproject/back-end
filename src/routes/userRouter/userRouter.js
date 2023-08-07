@@ -162,12 +162,12 @@ userRouter.get('/profile/:model/:username/appointments', bearerAuth, async (req,
 });
 
 
-userRouter.get('/physicianGroups/:id', physicianGroups);
+userRouter.get('/physicianGroups/:username', physicianGroups);
 userRouter.get('/GroupOfPatients/:id', GroupOfPatients);
 
 async function physicianGroups(req, res) {
-    const id = req.params.id;
-    const physicianGroupsById = await physician.readPhysicianGroups(id, group.model);
+    const username = req.params.username;
+    const physicianGroupsById = await physician.readPhysicianGroups(username, group.model);
     res.status(200).json(physicianGroupsById)
 }
 
