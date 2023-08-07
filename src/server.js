@@ -46,4 +46,4 @@ function start(port) {
 
 }
 
-module.exports = {start,app}
+module.exports = { start, app }
