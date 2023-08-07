@@ -47,8 +47,6 @@ class MethodCollection {
     deleteByUN(username) {
       return this.model.destroy({ where: { username }});
     }
-  
-
   }
 
   

@@ -13,6 +13,7 @@ const appointmentModel = require('./appointment/appointment')
 
 
 const QuestionAnswerModel = require('./questionAnswer/questionAnswer')
+const commentsModel = require('./questionAnswer/comments')
 const diseaseModel = require('../models/diseaseControl/diseaseControl')
 const prescriptionModel = require('../models/prescriptions/prescriptions')
 
@@ -26,9 +27,16 @@ let patients = patientModel(sequelize, DataTypes);
 let appointment = appointmentModel(sequelize, DataTypes);
 
 let QuestionAnswer = QuestionAnswerModel(sequelize, DataTypes);
+let comments = commentsModel(sequelize, DataTypes);
 let diseases = diseaseModel(sequelize, DataTypes);
 let prescriptions = prescriptionModel(sequelize, DataTypes);
 
+// sourceKey -> PK
+QuestionAnswer.hasMany(comments, {as : 'Comments',foreignKey: 'postID', sourceKey: 'id'});
+
+
+// targetKey -> the target model PK
+comments.belongsTo(QuestionAnswer, {foreignKey: 'postID', targetKey: 'id'})
 
 
 //--------------------------------------------
@@ -41,6 +49,7 @@ appointment.belongsTo(physician, { foreignKey: 'physicianUsername', targetKey: '
 //-------------------------------------------------
 
 
+
 module.exports = {
     db: sequelize,
     patient: new Collection(patients),
@@ -48,7 +57,9 @@ module.exports = {
     physician: new Collection(physician),
     disease: new Collection(diseases),
     prescription: new Collection(prescriptions),
-    appointment: new Collection(appointment)
+    appointment: new Collection(appointment),
+    Comment: new Collection(comments)
+
 };
 
 
