@@ -1,26 +1,33 @@
-// routes/qaRoutes.js
+//! routes/qaRoutes.js
 const express = require('express');
 const { QuestionAnswer } = require('../../models/index');
-
+const bearerAuth = require('../../middleware/auth/bearer')
+const modelMiddleware = require('../../middleware/routerModelling/routerModelling');
 const qaRouter = express.Router();
+qaRouter.param('model', modelMiddleware)
 
+//! create a new post
+qaRouter.post('/:model/profile/:username/Q&A',bearerAuth, async (req, res) => {
+  const {model} = req.params;
 
-qaRouter.post('/Q&A', async (req, res) => {
-  try {
-    const { title, description } = req.body;
-    const newPost = await QuestionAnswer.create({
-      title,
-      description,
-    });
-    res.status(201).json(newPost);
-  } catch (error) {
-    console.error('Error creating Q&A post:', error);
-    res.status(500).json({ message: 'Error creating Q&A post' });
-  }
+    try {
+      
+      if(model === 'patient'){
+        req.body.craetedBy=req.params.username;
+        const newPost = await QuestionAnswer.create(req.body);
+      res.status(201).json(newPost);
+      }else{
+        res.status(404).json({message : 'Sorry, The patient only can craete a post'});
+      }
+      
+    } catch (error) {
+      console.error('Error creating Q&A post:', error);
+      res.status(500).json({ message: 'Error creating Q&A post' });
+    }
 });
 
-
-qaRouter.get('/Q&A', async (req, res) => {
+//! get all posts 
+qaRouter.get('/:model/profile/:username/Q&A',bearerAuth, async (req, res) => {
   try {
     const allPosts = await QuestionAnswer.get();
     res.json(allPosts);
@@ -30,8 +37,8 @@ qaRouter.get('/Q&A', async (req, res) => {
   }
 });
 
-
-qaRouter.get('/Q&A/:id', async (req, res) => {
+//! get post bt id 
+qaRouter.get('/:model/profile/:username/Q&A/:id',bearerAuth, async (req, res) => {
   const postId = req.params.id;
   try {
     const post = await QuestionAnswer.get(postId);
@@ -45,20 +52,55 @@ qaRouter.get('/Q&A/:id', async (req, res) => {
   }
 });
 
-
-qaRouter.put('/Q&A/:id', async (req, res) => {
+//! update a post
+qaRouter.put('/:model/profile/:username/Q&A/:id',bearerAuth, async (req, res) => {
+ 
+  const {username} = req.params;
   const postId = req.params.id;
+  const { text } = req.body;
+  
   try {
     const post = await QuestionAnswer.get(postId);
+    console.log(post.craetedBy);
+    const {model} = req.params;
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
-    const { title, description } = req.body;
-    await post.update({ title, description });
-    res.json(post);
+
+    if(model === 'patient' && post.craetedBy === username ){
+      const { title, description} = req.body;
+      await post.update({ title, description});
+      res.json(post);
+    
+    }else{
+      res.status(404).json({ message: 'Access Denied' });
+    }
   } catch (error) {
     console.error('Error updating Q&A post:', error);
     res.status(500).json({ message: 'Error updating Q&A post' });
+  }
+});
+
+//! delete a post
+qaRouter.delete('/:model/profile/:username/Q&A/:id',bearerAuth, async (req, res) => {
+  const postId = req.params.id;
+  const {username} = req.params;
+  const {model} = req.params;
+  try {
+      const post = await QuestionAnswer.get(postId);
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+      }
+      if(model === 'patient' && post.craetedBy === username ){
+        await post.destroy();
+      res.json({ message: 'Post deleted successfully' });
+      }else{
+        res.json({ message: 'You cant delete the post' });
+      }
+      
+  } catch (error) {
+    console.error('Error deleting Q&A post:', error);
+    res.status(500).json({ message: 'Error deleting Q&A post' });
   }
 });
 
