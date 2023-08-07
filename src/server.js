@@ -12,6 +12,8 @@ const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
 const qaRoutes = require('./routes/qaRoute/qaRoute');
 
+
+const groupRouter = require("./routes/groupsRouter/groupsRouter")
 // const physQaRouter = require("./routes/qaRoute/physQaRoute") // doesn't exist
 const relations = require("./routes/testingRelations/testingRelations")
 const subscriptionRouter = require("./routes/subscriptions/subscriptions")
@@ -20,6 +22,7 @@ const vitalsRouter = require("./routes/vitalsRoute/vitalsRoutePatient")
 const vitalsPhysicianRouter = require("./routes/vitalsRoute/vitalRoutePhysician")
 
 const commentRoutes = require("./routes/qaRoute/commentsRoute")
+
 
 
 // const patientRouter = require('./routes/patientRoute/patientRoute')
@@ -37,15 +40,16 @@ app.use(morgan('dev'))
 // app.use(patientRouter);
 // app.use(physicianRouter)
 app.use(userRouter)
-
 app.use(qaRoutes)
 app.use(commentRoutes)
 app.use(diseaseRouter)
+app.use(groupRouter)
 app.use(relations)
 app.use(subscriptionRouter)
 app.use(prescriptionRouter)
 app.use(vitalsRouter)
 app.use(vitalsPhysicianRouter)
+
 
 
 

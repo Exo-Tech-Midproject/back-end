@@ -6,6 +6,7 @@ const DBURL = process.env.DBURL || 'sqlite::memory:';
 const Collection = require('./CRUD/CRUD');
 const patientModel = require('./patient/patientInfo')
 const physicianModel = require('./physician/physicianInfo')
+const groupModel = require('./group/group')
 
 
 //---------------------------------------------------------
@@ -23,13 +24,19 @@ const prescriptionModel = require('../models/prescriptions/prescriptions')
 const vitalsModel = require('../models/vitalSigns/vitalSigns')
 
 
+
 //---------------------------------------------------------
+
 
 
 const sequelize = new Sequelize(DBURL)
 let physician = physicianModel(sequelize, DataTypes);
 let patients = patientModel(sequelize, DataTypes);
+
+let group = groupModel(sequelize, DataTypes);
+
 let appointment = appointmentModel(sequelize, DataTypes);
+
 
 let QuestionAnswer = QuestionAnswerModel(sequelize, DataTypes);
 let comments = commentsModel(sequelize, DataTypes);
@@ -60,8 +67,22 @@ QuestionAnswer.hasMany(comments, {as : 'Comments',foreignKey: 'postID', sourceKe
 //physician - prescription relation
 
 
+
+// relation one to many between physician & group
+
+physician.hasMany(group, {foreignKey: 'physicianId', sourceKey: 'id'});
+
+group.belongsTo(physician, {foreignKey: 'physicianId', targetKey: 'id'})
+
+// relation one to many between group & patients
+
+patients.belongsToMany(group, {as : 'Group',through: 'patients_group' , foreignKey: 'patientId' })
+
+group.belongsToMany(patients, {as : 'Member',through: 'patients_group' , foreignKey: 'groupId' })
+
 physician.hasMany(prescriptions, { as: 'PrescriptionsCreated', foreignKey: 'physicianName', sourceKey: 'username' });
 prescriptions.belongsTo(physician, { as: 'PrescribedBy', foreignKey: 'physicianName', targetKey: 'username' });
+
 
 // targetKey -> the target model PK
 comments.belongsTo(QuestionAnswer, {foreignKey: 'postID', targetKey: 'id'})
@@ -98,12 +119,13 @@ module.exports = {
     physician: new Collection(physician),
     disease: new Collection(diseases),
     prescription: new Collection(prescriptions),
+    group: new Collection(group),
     vital: new Collection(vitals),
     appointment: new Collection(appointment),
     Comment: new Collection(comments)
 
-
 };
+
 
 
 

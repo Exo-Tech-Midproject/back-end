@@ -107,27 +107,6 @@ function handlePhysicianSchema(sequelize, DataTypes) {
 
 
 
-  // physician.addAppointmentToPatient = async function (patientUsername, appointmentData) {
-  //   const patient = await sequelize.models.Patient.findOne({
-  //     where: { username: patientUsername },
-  //   });
-
-  //   if (!patient) {
-  //     throw new Error('Patient not found');
-  //   }
-
-  //   const appointment = await sequelize.models.Appointment.create(appointmentData);
-  //   await patient.addAppointment(appointment);
-  //   return appointment;
-  // },
-
-  //   // Add the method to add an appointment for themselves
-  //   addAppointmentToSelf = async function (appointmentData) {
-  //     const appointment = await sequelize.models.Appointment.create(appointmentData);
-  //     await this.addAppointment(appointment);
-  //     return appointment;
-  //   }
-
   return physician;
 }
 
