@@ -16,6 +16,13 @@ module.exports = async (req, res, next) => {
     req.user = validUser;
     req.token = validUser.token;
 
+    if(req.params.username === req.user.username){
+
+      next();
+    }else _authError()
+
+
+
     //! updated by tasneem
     if (req.user.username === req.params.username) {
       next();

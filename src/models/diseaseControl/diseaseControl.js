@@ -22,10 +22,14 @@ function diseaseControl(sequelize, DataTypes) {
             type: DataTypes.TEXT,
             defaultValue: 'No Social History'
         },
-        username:{
+        patientUN:{
             type:DataTypes.STRING(24),
             allowNull:false,
             unique:true
+        },
+        physicianUN:{
+            type:DataTypes.STRING(24),
+            allowNull:false,
         }
         
     })

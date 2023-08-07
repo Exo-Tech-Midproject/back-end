@@ -11,7 +11,8 @@ function handlePatientSchema(sequelize, DataTypes) {
     username: {
       type: DataTypes.STRING(24),
       allowNull: false,
-      unique: true
+      unique: true,
+      primaryKey:true
     },
     token: {
       type: DataTypes.VIRTUAL,
@@ -33,7 +34,8 @@ function handlePatientSchema(sequelize, DataTypes) {
     },
     insurance: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: 'No Insurance'
     },
     gender: {
       type: DataTypes.STRING,
