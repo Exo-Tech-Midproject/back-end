@@ -21,6 +21,7 @@ const prescriptionRouter = require("./routes/prescriptionsRoute/prescriptionRout
 const vitalsRouter = require("./routes/vitalsRoute/vitalsRoutePatient")
 const vitalsPhysicianRouter = require("./routes/vitalsRoute/vitalRoutePhysician")
 
+const passwordRouter = require('./routes/forgetPassword/forgetPassword')
 const commentRoutes = require("./routes/qaRoute/commentsRoute")
 
 
@@ -50,6 +51,7 @@ app.use(prescriptionRouter)
 app.use(vitalsRouter)
 app.use(vitalsPhysicianRouter)
 
+app.use(passwordRouter)
 
 
 

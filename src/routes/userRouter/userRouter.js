@@ -81,7 +81,7 @@ userRouter.get('/profile/:model/:username', async (req, res) => {
 
     const username = req.params.username;
     // console.log(username)
-    console.log(req.model.model)
+    // console.log(req.model.model)
 
     const userProfile = await req.model.getByUN(username);
 
@@ -128,7 +128,7 @@ userRouter.post('/profile/:model/:username/appointments', async (req, res) => {
     const username = req.params.username;
     const user = await req.model.getByUN(username);
 
-    console.log("model", req.params.model)
+    // console.log("model", req.params.model)
 
     if (req.params.model === 'physician') {
         let appointmentData = req.body;
@@ -148,7 +148,7 @@ userRouter.post('/profile/:model/:username/appointments', async (req, res) => {
 //retrieve appointment
 userRouter.get('/profile/:model/:username/appointments', bearerAuth, async (req, res) => {
     const username = req.params.username;
-    console.log("req.user.params = ", req.user.username)
+    // console.log("req.user.params = ", req.user.username)
     if (req.user.username !== username) {
         return res.status(403).json({ error: 'Access denied' });
     }
