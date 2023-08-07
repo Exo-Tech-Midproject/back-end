@@ -70,9 +70,9 @@ QuestionAnswer.hasMany(comments, {as : 'Comments',foreignKey: 'postID', sourceKe
 
 // relation one to many between physician & group
 
-physician.hasMany(group, {foreignKey: 'physicianId', sourceKey: 'id'});
+physician.hasMany(group, {foreignKey: 'physicianUN', sourceKey: 'username'});
 
-group.belongsTo(physician, {foreignKey: 'physicianId', targetKey: 'id'})
+group.belongsTo(physician, {foreignKey: 'physicianUN', targetKey: 'username'})
 
 // relation one to many between group & patients
 

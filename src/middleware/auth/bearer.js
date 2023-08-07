@@ -16,10 +16,10 @@ module.exports = async (req, res, next) => {
     req.user = validUser;
     req.token = validUser.token;
 
-    if(req.params.username === req.user.username){
+    // if(req.params.username === req.user.username){
 
-      next();
-    }else _authError()
+    //   next();
+    // }else _authError()
 
 
 
