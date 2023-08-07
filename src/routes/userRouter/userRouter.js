@@ -6,8 +6,7 @@ const basicAuth = require('../../middleware/auth/basic')
 const bearerAuth = require('../../middleware/auth/bearer')
 
 
-
-const { group , physician , patient, appointment} = require('../../models')
+const { group , physician , patient, appointment , groupPosts} = require('../../models')
 
 const models = require('../../models/index')
 
@@ -164,11 +163,13 @@ userRouter.get('/profile/:model/:username/appointments', bearerAuth, async (req,
 
 userRouter.get('/physicianGroups/:username', physicianGroups);
 userRouter.get('/GroupOfPatients/:id', GroupOfPatients);
+userRouter.post('/:model/:username/groups/:groupId/posts', bearerAuth ,groupsPosts);
+userRouter.get('/groups/:groupId/posts', getGroupsPosts);
 
 async function physicianGroups(req, res) {
     const username = req.params.username;
-    const physicianGroupsById = await physician.readPhysicianGroups(username, group.model);
-    res.status(200).json(physicianGroupsById)
+    const physicianGroupsByUn = await physician.readPhysicianGroups(username, group.model);
+    res.status(200).json(physicianGroupsByUn)
 }
 
 async function GroupOfPatients(req, res) {
@@ -176,6 +177,64 @@ async function GroupOfPatients(req, res) {
     const GroupOfPatientsById = await group.readMemberGroups(id, patient.model);
     res.status(200).json(GroupOfPatientsById)
 }
+
+// Route to get posts for a specific group
+async function getGroupsPosts (req, res) {
+    try {
+    const groupId = req.params.groupId;
+      // Check if the group exists
+    const groups = await group.model.findOne({ where: { id: groupId } });
+    if (!groups) {
+        return res.status(404).json({ error: 'Group not found.' });
+    }
+
+      // Fetch all posts for the specified group
+    const posts = await groupPosts.model.findAll({ where: { groupId } });
+
+    res.status(200).json( posts );
+    } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the posts.' });
+    }
+};
+
+
+async function groupsPosts (req, res) {
+    try {
+    const {groupId , username} = req.params;
+    // console.log("group id ", groupId)
+    const { title, textContent } = req.body;
+    // const authorUsername = req.user.username;
+    // console.log("authorUsername",authorUsername)
+
+      // Check if the physician exists
+    const authorPhysician = await physician.model.findOne({ where: { username } });
+    if (!authorPhysician) {
+        return res.status(404).json({ error: 'Author physician not found.' });
+    }
+
+    // Check if the group exists
+    const groups = await group.model.findOne({ where: { id: groupId } });
+    if (!groups) {
+    return res.status(404).json({ error: 'Group not found.' });
+    }
+    if(authorPhysician.username === groups.physicianUN){
+        // Create the post
+    const newPost = await groupPosts.create({
+    title,
+    author: username,
+    textContent,
+    groupId,
+    });
+    res.status(201).json({ message: 'Post added successfully.', post: newPost });
+    }
+    } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while adding the post.' });
+}
+};
+
+
 
 module.exports = userRouter;
 

@@ -10,11 +10,10 @@ function handleGroupSchema(sequelize, DataTypes) {
     physicianUN:{
         type: DataTypes.STRING,
         allowNull: false
+    },
+    patientUN:{
+        type: DataTypes.INTEGER,
     }
-    // patientId:{
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false
-    // }
     })
     return group;
 }

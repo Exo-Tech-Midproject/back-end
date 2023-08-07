@@ -15,8 +15,8 @@ groupRouter.post('/group/:id/:username', addMembersToGroups);
 async function addMembersToGroups(req , res , next ){
     try{
     const { id , username } = req.params
-
     const userFound = await patient.getByUN(username)
+    console.log("aaaaa",userFound)
     const foundGroup = await group.get(id)
     const addMembers = await foundGroup.addMember(userFound)
     res.status(201).json(addMembers)

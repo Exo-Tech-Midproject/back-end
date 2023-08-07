@@ -7,6 +7,7 @@ const Collection = require('./CRUD/CRUD');
 const patientModel = require('./patient/patientInfo')
 const physicianModel = require('./physician/physicianInfo')
 const groupModel = require('./group/group')
+const groupPostsModel = require('./group/groupPosts')
 
 
 //---------------------------------------------------------
@@ -34,6 +35,7 @@ let physician = physicianModel(sequelize, DataTypes);
 let patients = patientModel(sequelize, DataTypes);
 
 let group = groupModel(sequelize, DataTypes);
+let groupPosts= groupPostsModel(sequelize, DataTypes);
 
 let appointment = appointmentModel(sequelize, DataTypes);
 
@@ -74,6 +76,7 @@ physician.hasMany(group, {foreignKey: 'physicianUN', sourceKey: 'username'});
 
 group.belongsTo(physician, {foreignKey: 'physicianUN', targetKey: 'username'})
 
+
 // relation one to many between group & patients
 
 patients.belongsToMany(group, {as : 'Group',through: 'patients_group' , foreignKey: 'patientId' })
@@ -82,6 +85,16 @@ group.belongsToMany(patients, {as : 'Member',through: 'patients_group' , foreign
 
 physician.hasMany(prescriptions, { as: 'PrescriptionsCreated', foreignKey: 'physicianName', sourceKey: 'username' });
 prescriptions.belongsTo(physician, { as: 'PrescribedBy', foreignKey: 'physicianName', targetKey: 'username' });
+
+// relations between group & groupPosts
+
+group.hasMany(groupPosts, { foreignKey: 'groupId', sourceKey: 'id', as: 'posts', });
+groupPosts.belongsTo(group, { foreignKey: 'groupId', targetKey: 'id', as: 'group', });
+
+// relations between roupPosts & physician
+
+physician.hasMany(group, { foreignKey: 'author', sourceKey: 'username', as: 'owner', });
+group.belongsTo(physician, { foreignKey: 'author', targetKey: 'username', as: 'group', });
 
 
 // targetKey -> the target model PK
@@ -122,8 +135,8 @@ module.exports = {
     group: new Collection(group),
     vital: new Collection(vitals),
     appointment: new Collection(appointment),
-    Comment: new Collection(comments)
-
+    Comment: new Collection(comments),
+    groupPosts: new Collection(groupPosts)
 };
 
 
