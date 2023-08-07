@@ -14,7 +14,10 @@ module.exports = async (req, res, next) => {
     const validUser = await schema.model.authenticateToken(token);
     req.user = validUser;
     req.token = validUser.token;
-    next();
+    if(req.params.username === req.user.username){
+
+      next();
+    }else _authError()
 
   } catch (e) {
     _authError();

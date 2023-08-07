@@ -15,6 +15,8 @@ const physQaRouter = require("./routes/qaRoute/physQaRoute")
 const relations = require("./routes/testingRelations/testingRelations")
 const subscriptionRouter = require("./routes/subscriptions/subscriptions")
 const prescriptionRouter = require("./routes/prescriptionsRoute/prescriptionRoute")
+const vitalsRouter = require("./routes/vitalsRoute/vitalsRoutePatient")
+const vitalsPhysicianRouter = require("./routes/vitalsRoute/vitalRoutePhysician")
 
 // const patientRouter = require('./routes/patientRoute/patientRoute')
 // const physicianRouter = require('./routes/physicianRoutes/physicianRoutes');
@@ -38,6 +40,8 @@ app.use(diseaseRouter)
 app.use(relations)
 app.use(subscriptionRouter)
 app.use(prescriptionRouter)
+app.use(vitalsRouter)
+app.use(vitalsPhysicianRouter)
 
 
 

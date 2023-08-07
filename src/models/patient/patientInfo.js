@@ -33,7 +33,8 @@ function handlePatientSchema(sequelize, DataTypes) {
     },
     insurance: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
+      defaultValue: 'No Insurance'
     },
     gender: {
       type: DataTypes.STRING,

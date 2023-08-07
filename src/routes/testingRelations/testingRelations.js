@@ -11,8 +11,8 @@ relationRouter.param('model',routerModelling)
 
 relationRouter.get('/allUsersHistory', handleAllUsers)
 relationRouter.get('/allPhysicianCreatedHistory', handleAllphysicianHistory)
-relationRouter.get('/profile/:model/:physicianUN/CreatedHistory',bearer ,handleOnephysicianHistory)
-relationRouter.get('/profile/:model/:physicianUN/:patientUN/subscribe',bearer ,handleSubscirbe)
+relationRouter.get('/profile/:model/:username/CreatedHistory',bearer ,handleOnephysicianHistory)
+relationRouter.get('/profile/:model/:username/:patientUN/subscribe',bearer ,handleSubscirbe)
 
 
 async function handleAllUsers(req,res) {
@@ -26,11 +26,11 @@ async function handleAllphysicianHistory(req,res) {
     res.status(200).json(allHistory)
 }
 async function handleOnephysicianHistory(req,res,next) {
-    const {model,physicianUN} = req.params
+    const {model,username} = req.params
     try {
         if(model !== 'physician') throw new Error('Access denied')
 
-        let allHistory = await physician.getRelatedDataOnePhysician(physicianUN,disease.model)
+        let allHistory = await physician.getRelatedDataOnePhysician(username,disease.model)
     
         res.status(200).json(allHistory)
     } catch(err){
@@ -38,11 +38,11 @@ async function handleOnephysicianHistory(req,res,next) {
     }
 }
 async function handleSubscirbe(req,res,next) {
-    const {model,physicianUN,patientUN} = req.params
+    const {model,username,patientUN} = req.params
     try {
         if(model !== 'physician') throw new Error('Access denied')
-        console.log(patientUN,physicianUN,model)
-        let physicianName = await physician.getByUN(physicianUN)
+        console.log(patientUN,username,model)
+        let physicianName = await physician.getByUN(username)
         let patientName = await patient.getByUN(patientUN)
         console.log(physicianName,patientName)
         await physicianName.addSubscriber(patientName)
