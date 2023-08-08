@@ -7,11 +7,14 @@ const bearerAuth = require('../../middleware/auth/bearer')
 
 
 
+
+
 const { group , physician , patient, appointment} = require('../../models')
 
 const models = require('../../models/index')
 
-const modelMiddleware = require('../../middleware/routerModelling/routerModelling')
+const modelMiddleware = require('../../middleware/routerModelling/routerModelling');
+const { app } = require('../../server');
 
 userRouter.param('model', modelMiddleware);
 
@@ -68,8 +71,18 @@ userRouter.post('/login/:model', basicAuth, (req, res, next) => {
         user: req.user,
         token: req.user.token
     };
-    res.status(200).json(user);
+    const authToken = user.token;
+    console.log(authToken);
+
+  res.cookie('authToken', authToken, { maxAge: 86400000 }); // 1 day expiration
+  res.status(200).json(user);
+  
 });
+
+userRouter.get('/logout',(req, res) => {
+    res.cookie('authToken', '', { maxAge: 1 });
+    res.redirect('/');
+  });
 
 userRouter.get('/:model/secret', bearerAuth, async (req, res, next) => {
     let users = await req.model.get()
