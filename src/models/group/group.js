@@ -2,7 +2,7 @@
 
 function handleGroupSchema(sequelize, DataTypes) {
     let group = sequelize.define('Group', {
-    username:{
+    groupName:{
         type :DataTypes.STRING,
         allowNull: false,
         unique: true
@@ -11,10 +11,7 @@ function handleGroupSchema(sequelize, DataTypes) {
         type: DataTypes.STRING,
         allowNull: false
     }
-    // patientId:{
-    //     type: DataTypes.INTEGER,
-    //     allowNull: false
-    // }
+    
     })
     return group;
 }
