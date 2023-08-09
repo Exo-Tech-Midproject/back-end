@@ -11,6 +11,7 @@ const diseaseRouter = require('./routes/diseaseRoute/diseaseRouter');
 const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
 const qaRoutes = require('./routes/qaRoute/qaRoute');
+const cookieParser = require('cookie-parser');
 
 
 const groupRouter = require("./routes/groupsRouter/groupsRouter")
@@ -40,6 +41,7 @@ const genenralRoute = require("./routes/generalRouter/generalRouter")
 app.use(express.json())
 app.use(cors())
 app.use(morgan('dev'))
+app.use(cookieParser());
 
 
 // using routes ------------------------------------
