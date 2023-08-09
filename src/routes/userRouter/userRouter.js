@@ -1,3 +1,4 @@
+
 'use strict'
 
 const express = require('express');
@@ -45,26 +46,14 @@ userRouter.get('/login', (req, res, next) => {
             "mobileNumber":"Your mobile Number" ,
             "emailAddress": "Your Email"   
         }
+
         
 
-    }
+//     }
 
-    res.status(200).json(response);
-});
+//     res.status(200).json(response);
+// });
 
-userRouter.post('/signup/:model', async (req, res, next) => {
-    try {
-        // req.body.username = req.body.username.toLowerCase()
-        let user = await req.model.create(req.body);
-        const output = {
-            user: user,
-            token: user.token
-        };
-        res.status(201).json(output);
-    } catch (e) {
-        next(e.message)
-    }
-});
 
 userRouter.post('/login/:model', basicAuth, (req, res, next) => {
     const user = {
@@ -90,105 +79,118 @@ userRouter.get('/:model/secret', bearerAuth, async (req, res, next) => {
 });
 
 
-userRouter.get('/profile/:model/:username', async (req, res) => {
 
-    const username = req.params.username;
-    // console.log(username)
-    console.log(req.model.model)
-
-    const userProfile = await req.model.getByUN(username);
-
-    if (!userProfile) {
-        return res.status(404).json({ error: 'User not found' });
-    } else {
-        res.status(200).json(userProfile);
-    }
-
-});
-
-userRouter.put('/profile/:model/:username', async (req, res) => {
-    const username = req.params.username;
-    const obj = req.body;
-
-    let updateProfile = await req.model.updateByUN(username, obj);
-
-    if (!updateProfile) {
-        return res.status(404).json({ error: 'Access denied' });
-    } else {
-        res.status(200).json(updateProfile);
-    }
-});
+// userRouter.get('/:model/secret', bearerAuth, async (req, res, next) => {
+//     let users = await req.model.get()
+//     res.status(200).json(users)
+// });
 
 
-
-userRouter.get('/', async (req, res, next) => {
-    res.status(200).json("Welcome to Home Page")
-})
-
-userRouter.get('/signup', (req, res) => {
-    const welcomeMessage = `
-    Welcome to the Signup Page!
-    To sign up as a patient, use: /signup/patient
-    To sign up as a physician, use: /signup/physician`;
-    res.send(welcomeMessage);
-});
-//-----------------------------------------------------------------------------
-// Appointment Routes
-
-//add Appointment
-userRouter.post('/profile/:model/:username/appointments', async (req, res) => {
-
-    const username = req.params.username;
-    const user = await req.model.getByUN(username);
-
-    console.log("model", req.params.model)
-
-    if (req.params.model === 'physician') {
-        let appointmentData = req.body;
-        appointmentData.physicianUsername = req.params.username;
-
-        const appointmentInfo = await appointment.create(appointmentData);
-        const output = {
-            appointmentInfo: appointmentInfo
-        };
-        return res.status(201).json(appointmentInfo);
-    } else {
-        return res.status(403).json({ error: 'Access denied' });
-    }
-
-});
-
-//retrieve appointment
-userRouter.get('/profile/:model/:username/appointments', bearerAuth, async (req, res) => {
-    const username = req.params.username;
-    console.log("req.user.params = ", req.user.username)
-    if (req.user.username !== username) {
-        return res.status(403).json({ error: 'Access denied' });
-    }
-
-    const user = await req.model.getByUN(username);
-
-    const appointments = await appointment.model.findAll({ where: { physicianUsername: username } })
-
-    return res.status(200).json(appointments);
-
-});
+// userRouter.get('/profile/:model/:username', async (req, res) => {
 
 
-userRouter.get('/physicianGroups/:username', physicianGroups);
-userRouter.get('/GroupOfPatients/:id', GroupOfPatients);
+//     const username = req.params.username;
+//     // console.log(username)
+//     console.log(req.model.model)
 
-async function physicianGroups(req, res) {
-    const username = req.params.username;
-    const physicianGroupsById = await physician.readPhysicianGroups(username, group.model);
-    res.status(200).json(physicianGroupsById)
-}
 
-async function GroupOfPatients(req, res) {
-    const id = req.params.id;
-    const GroupOfPatientsById = await group.readMemberGroups(id, patient.model);
-    res.status(200).json(GroupOfPatientsById)
-}
+//     const userProfile = await req.model.getByUN(username);
 
-module.exports = userRouter;
+//     if (!userProfile) {
+//         return res.status(404).json({ error: 'User not found' });
+//     } else {
+//         res.status(200).json(userProfile);
+//     }
+
+// });
+
+// userRouter.put('/profile/:model/:username', async (req, res) => {
+//     const username = req.params.username;
+//     const obj = req.body;
+
+//     let updateProfile = await req.model.updateByUN(username, obj);
+
+//     if (!updateProfile) {
+//         return res.status(404).json({ error: 'Access denied' });
+//     } else {
+//         res.status(200).json(updateProfile);
+//     }
+// });
+
+
+
+// userRouter.get('/', async (req, res, next) => {
+//     res.status(200).json("Welcome to Home Page")
+// })
+
+// userRouter.get('/signup', (req, res) => {
+//     const welcomeMessage = `
+//     Welcome to the Signup Page!
+//     To sign up as a patient, use: /signup/patient
+//     To sign up as a physician, use: /signup/physician`;
+//     res.send(welcomeMessage);
+// });
+// //-----------------------------------------------------------------------------
+// // Appointment Routes
+
+// //add Appointment
+// userRouter.post('/profile/:model/:username/appointments', async (req, res) => {
+
+//     const username = req.params.username;
+//     const user = await req.model.getByUN(username);
+
+
+//     console.log("model", req.params.model)
+
+
+//     if (req.params.model === 'physician') {
+//         let appointmentData = req.body;
+//         appointmentData.physicianUsername = req.params.username;
+
+//         const appointmentInfo = await appointment.create(appointmentData);
+//         const output = {
+//             appointmentInfo: appointmentInfo
+//         };
+//         return res.status(201).json(appointmentInfo);
+//     } else {
+//         return res.status(403).json({ error: 'Access denied' });
+//     }
+
+// });
+
+
+// //retrieve appointment
+// userRouter.get('/profile/:model/:username/appointments', bearerAuth, async (req, res) => {
+//     const username = req.params.username;
+//     console.log("req.user.params = ", req.user.username)
+//     if (req.user.username !== username) {
+//         return res.status(403).json({ error: 'Access denied' });
+//     }
+
+
+//     const user = await req.model.getByUN(username);
+
+//     const appointments = await appointment.model.findAll({ where: { physicianUsername: username } })
+
+//     return res.status(200).json(appointments);
+
+// });
+
+
+// userRouter.get('/physicianGroups/:username', physicianGroups);
+// userRouter.get('/GroupOfPatients/:id', GroupOfPatients);
+
+// async function physicianGroups(req, res) {
+//     const username = req.params.username;
+//     const physicianGroupsById = await physician.readPhysicianGroups(username, group.model);
+//     res.status(200).json(physicianGroupsById)
+// }
+
+// async function GroupOfPatients(req, res) {
+//     const id = req.params.id;
+//     const GroupOfPatientsById = await group.readMemberGroups(id, patient.model);
+//     res.status(200).json(GroupOfPatientsById)
+// }
+
+// module.exports = userRouter;
 

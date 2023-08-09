@@ -22,7 +22,14 @@ const prescriptionRouter = require("./routes/prescriptionsRoute/prescriptionRout
 const vitalsRouter = require("./routes/vitalsRoute/vitalsRoutePatient")
 const vitalsPhysicianRouter = require("./routes/vitalsRoute/vitalRoutePhysician")
 
+
+const passwordRouter = require('./routes/forgetPassword/forgetPassword')
+
 const commentRoutes = require("./routes/qaRoute/commentsRoute")
+const patientRoute = require("./routes/userRouter/userPatientRouter")
+const physicianRoute = require("./routes/userRouter/userPhysicianRouter")
+const genenralRoute = require("./routes/generalRouter/generalRouter")
+
 
 
 
@@ -41,17 +48,21 @@ app.use(cookieParser());
 
 // app.use(patientRouter);
 // app.use(physicianRouter)
-app.use(userRouter)
-app.use(qaRoutes)
-app.use(commentRoutes)
-app.use(diseaseRouter)
-app.use(groupRouter)
+// app.use(userRouter)
+// app.use(qaRoutes)
+// app.use(commentRoutes)
+// app.use(diseaseRouter)
+// app.use(groupRouter)
 app.use(relations)
 app.use(subscriptionRouter)
-app.use(prescriptionRouter)
-app.use(vitalsRouter)
-app.use(vitalsPhysicianRouter)
+app.use(patientRoute)
+app.use(physicianRoute)
+app.use(genenralRoute)
+// app.use(prescriptionRouter)
+// app.use(vitalsRouter)
+// app.use(vitalsPhysicianRouter)
 
+app.use(passwordRouter)
 
 
 

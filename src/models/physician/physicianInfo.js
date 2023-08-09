@@ -11,7 +11,7 @@ function handlePhysicianSchema(sequelize, DataTypes) {
       type: DataTypes.STRING(24),
       allowNull: false,
       unique: true,
-      primaryKey:true
+      primaryKey: true
     },
     token: {
       type: DataTypes.VIRTUAL,
@@ -75,6 +75,11 @@ function handlePhysicianSchema(sequelize, DataTypes) {
     },
     address: {
       type: DataTypes.STRING
+    },
+    resetToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: ''
     }
   });
 

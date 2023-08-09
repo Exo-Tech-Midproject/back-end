@@ -12,7 +12,7 @@ function handlePatientSchema(sequelize, DataTypes) {
       type: DataTypes.STRING(24),
       allowNull: false,
       unique: true,
-      primaryKey:true
+      primaryKey: true
     },
     token: {
       type: DataTypes.VIRTUAL,
@@ -78,6 +78,10 @@ function handlePatientSchema(sequelize, DataTypes) {
       validate: {
         isEmail: true
       }
+    },
+    resetToken: {
+      type: DataTypes.STRING,
+      defaultValue: ''
     }
     // groupId:{
     //   type: DataTypes.INTEGER,
@@ -91,6 +95,7 @@ function handlePatientSchema(sequelize, DataTypes) {
   });
 
   patient.authenticateBasic = async function (username, password) {
+    
     const user = await this.findOne({ where: { username } });
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
