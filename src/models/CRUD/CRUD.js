@@ -178,9 +178,9 @@ class MethodCollection {
   
 
   
-    async readPhysicianGroups(id, model) {
+    async readPhysicianGroups(username, model) {
       const records = await this.model.findOne({
-        where: { id },
+        where: { username },
         include: model
       });
       return records;
