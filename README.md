@@ -101,6 +101,13 @@ The application's focus is on providing seamless communication between patients 
 - Verify that physicians can create and manage educational groups successfully.
 - Confirm that physicians can post educational content and resources for patients.
 
+## our Schemas
+
+![schema4](./assets/schema1.jpg)
+![schema1](./assets/schema2.jpg)
+![schema2](./assets/schema3.jpg)
+![schema3](./assets/schema4.jpg)
+
 ## PM Tools
 
 1. **Trello** project management tool to distribution
