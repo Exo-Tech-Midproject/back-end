@@ -53,6 +53,10 @@ function vitalSigns(sequelize, DataTypes) {
               }
 
         },
+        isHigh: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        }
 
     })
     

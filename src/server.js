@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const morgan = require('morgan');
-
+const statusRoute = require('./notification/status')
 // require('dotenv').config();
 
 const errorHandler = require('./error-handlers/500');
@@ -28,11 +28,11 @@ app.use(cors())
 app.use(morgan('dev'))
 app.use(cookieParser());
 
-
 // using routes ------------------------------------
 
 // app.use(relations)
 // app.use(subscriptionRouter)
+app.use(statusRoute)
 app.use(patientRoute)
 app.use(physicianRoute)
 app.use(genenralRoute)
