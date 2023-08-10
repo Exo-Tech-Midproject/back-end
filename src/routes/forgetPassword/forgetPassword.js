@@ -4,11 +4,11 @@ const bcrypt = require('bcrypt');
 const express = require('express');
 const { patient, physician, } = require('../../models');
 const passwordRouter = express.Router();
-const bearerAuth = require('../../middleware/auth/bearer');
+// const bearerAuth = require('../../middleware/auth/bearer');
 
 const crypto = require('crypto');
-const modelMiddleware = require('../../middleware/routerModelling/routerModelling');
-passwordRouter.param('model', modelMiddleware);
+// const modelMiddleware = require('../../middleware/routerModelling/routerModelling');
+// passwordRouter.param('model', modelMiddleware);
 
 function generateResetToken() {
     const resetToken = crypto.randomBytes(32).toString('hex');

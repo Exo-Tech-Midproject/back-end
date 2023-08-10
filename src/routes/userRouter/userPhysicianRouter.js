@@ -18,8 +18,14 @@ const { group , physician , patient, appointment, vital, disease, prescription ,
 //Signup & login patient routes
 physicianRouter.post('/signup/physician', signupPhysicianHandler);
 physicianRouter.post('/login/physician', basicAuthPhysician, loginPhysiciantHandler)
+physicianRouter.get('/logout',logoutHandler)
 
-//patient profile routes
+
+// physician subscription routes
+physicianRouter.get('/physician/:username/patients/:patientUN/subscribe',bearerAuthphysician ,handleSubscirbe)
+physicianRouter.get('/physician/:username/patients/subscribers',bearerAuthphysician ,handleAllSubscribers)
+
+// physician profile routes
 physicianRouter.get('/physician/:username/profile', bearerAuthphysician , physicianProfileGetHandlder)
 physicianRouter.put('/physician/:username/profile', bearerAuthphysician , physicianProfileUpdateHandlder)
 
@@ -103,18 +109,83 @@ async function  signupPhysicianHandler (req, res, next){
 }
 async function  loginPhysiciantHandler (req, res, next){
     try {
-        {
-            const user = {
-                user: req.user,
-                token: req.user.token
-            };
-            res.status(200).json(user);
-        }
+        const user = {
+            user: req.user,
+            token: req.user.token
+        };
+        const authToken = user.token;
+        console.log(authToken);
+    
+      res.cookie('authToken', authToken, { maxAge: 86400000 ,httpOnly: true,path: '/'}); // 1 day expiration
+      res.status(200).json(user);
     } catch (e) {
         next(e.message)
     }
+
 }
 
+async function logoutHandler(req, res) {
+    res.cookie('authToken', '', { maxAge: 1 });
+    res.redirect('/');
+  };
+//----------------------------------------------------------------- Subscription handlers
+//----------------------------------------------------------------------------------
+
+async function handleSubscirbe(req,res,next) {
+    const {username,patientUN} = req.params
+    try {
+        console.log(patientUN,username)
+        let physicianName = await physician.getByUN(username)
+        let patientName = await patient.getByUN(patientUN)
+
+        
+        
+        if(!physicianName || !patientName) throw new Error(`Patient or Physician doesn't exist`)
+        
+        let exist = await physicianName.getSubscriber({
+            where:{
+                username : patientUN
+            }
+        })
+
+        if(exist[0]) throw new Error('This patient already is a subscriber')
+
+        console.log(physicianName,patientName)
+        await physicianName.addSubscriber(patientName)
+
+        let result = await physicianName.getSubscriber({
+            attributes: ['username' ,'mobileNumber', 'emailAddress', 'gender', 'fullName']
+        }) 
+        
+    
+        res.status(200).json(result)
+    } catch(err){
+        next(err)
+    }
+}
+async function handleAllSubscribers(req,res,next) {
+    const {username} = req.params
+    try {
+
+        let physicianName = await physician.getByUN(username)
+
+
+        
+        
+        if(!physicianName) throw new Error(`Physician doesn't exist`)
+        
+        let allSubscribers = await physicianName.getSubscriber({
+            attributes: ['username' ,'mobileNumber', 'emailAddress', 'gender', 'fullName']
+        })
+
+        if(!allSubscribers[0]) throw new Error('You got no subscribers yet')
+        
+    
+        res.status(200).json(allSubscribers)
+    } catch(err){
+        next(err)
+    }
+}
 //----------------------------------------------------------------- Profile handlers
 //----------------------------------------------------------------------------------
 async function  physicianProfileGetHandlder (req, res, next){
@@ -490,7 +561,7 @@ async function getAllgroupsPosts(req, res, next) {
         let groupsPostsFound = await groupPosts.model.findAll({
             where: {
                 author: username,
-                groupID: id
+                groupId: id
 
             }
         })
@@ -520,7 +591,7 @@ async function getOneGroupsPostByID(req, res, next ) {
         let groupsPostsFound = await groupPosts.model.findOne({
             where: {
                 author: username,
-                groupID: id,
+                groupId: id,
                 id : postID
 
             }
@@ -552,7 +623,7 @@ async function addgroupsPosts(req, res ,next) {
         if (!foundGroup) throw new Error(`You don't own that group`)
 
         req.body.author = username
-        req.body.groupID = id
+        req.body.groupId = id
         
         let createdPost = await groupPosts.create(req.body)
             
@@ -583,7 +654,7 @@ async function updateOneGroupsPostByID(req, res, next) {
                 where:{
                     id: postID,
                     author: username,
-                    groupID: id
+                    groupId: id
                 }})
 
                 if(!foundpost) throw new Error(`This post doesn't exist anymore`)
@@ -618,7 +689,7 @@ async function deleteOneGroupsPostByID(req, res, next) {
                 where:{
                     id: postID,
                     author: username,
-                    groupID: id
+                    groupId: id
                 }})
 
                 if(!foundpost) throw new Error(`This post doesn't exist anymore`)
@@ -626,7 +697,7 @@ async function deleteOneGroupsPostByID(req, res, next) {
                     {where: {
                         id:postID,
                         author:username,
-                        groupID:id
+                        groupId:id
                     }}
                     )
 
@@ -690,7 +761,7 @@ async function getOnePatientVitals (req,res,next){
             ],
             attributes:['username']
         })
-        if(!getAllPatientsRecords) throw new Error('Physician Not Found')
+        if(!getAllPatientsRecords) throw new Error(`this patient is not a subscriber yet`)
         let patientsRecordsCleaned = getAllPatientsRecords.Subscriber[0]
         res.status(200).json(patientsRecordsCleaned)
     } catch (err) {

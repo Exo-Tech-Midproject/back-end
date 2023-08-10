@@ -15,11 +15,15 @@ const { group , physician , patient, appointment, vital , disease , prescription
 
 
 
-//Signup & login patient routes
+// Signup & login patient routes
 patientRouter.post('/signup/patient', signupPatientHandler);
 patientRouter.post('/login/patient', basicAuthPatient, loginPatientHandler)
+patientRouter.get('/logout',logoutHandler)
 
-//patient profile routes
+// patient subscription routes
+patientRouter.get('/patient/:username/physicians/subscriptions',bearerAuthPatient ,handleAllSubscriptions)
+
+// patient profile routes
 patientRouter.get('/patient/:username/profile', bearerAuthPatient , patientProfileGetHandlder)
 patientRouter.put('/patient/:username/profile', bearerAuthPatient , patientProfileUpdateHandlder)
 
@@ -91,15 +95,48 @@ async function  signupPatientHandler (req, res, next){
 }
 async function  loginPatientHandler (req, res, next){
     try {
-        {
-            const user = {
-                user: req.user,
-                token: req.user.token
-            };
-            res.status(200).json(user);
-        }
+        const user = {
+            user: req.user,
+            token: req.user.token
+        };
+        const authToken = user.token;
+        console.log(authToken);
+    
+      res.cookie('authToken', authToken, { maxAge: 86400000 ,httpOnly: true,path: '/'}); // 1 day expiration
+      res.status(200).json(user);
     } catch (e) {
         next(e.message)
+    }
+}
+
+async function logoutHandler(req, res) {
+    res.cookie('authToken', '', { maxAge: 1 });
+    res.redirect('/');
+  };
+//----------------------------------------------------------------- Subscriptions handlers
+//----------------------------------------------------------------------------------
+
+async function handleAllSubscriptions(req,res,next) {
+    const {username} = req.params
+    try {
+
+        let patientName = await patient.getByUN(username)
+
+
+        
+        
+        if(!patientName) throw new Error(`patient doesn't exist`)
+        
+        let allSubscriptions = await patientName.getSubscription({
+            attributes: ['username' ,'mobileNumber', 'emailAddress', 'gender', 'fullName']
+        })
+
+        if(!allSubscriptions[0]) throw new Error('You got no subscriptions yet')
+        
+    
+        res.status(200).json(allSubscriptions)
+    } catch(err){
+        next(err)
     }
 }
 
@@ -266,7 +303,7 @@ async function getAllgroupsPosts(req, res, next) {
         if(!foundGroup) throw new Error(`You aren't a member in that group`)
         let groupsPostsFound = await groupPosts.model.findAll({
             where: {
-                groupID: id
+                groupId: id
 
             }
         })
@@ -296,7 +333,7 @@ async function getOneGroupsPostByID(req, res, next ) {
         if(!foundGroup[0]) throw new Error(`You aren't a member in that group`)
         let groupsPostsFound = await groupPosts.model.findOne({
             where: {
-                groupID: id,
+                groupId: id,
                 id:postID
 
             }
