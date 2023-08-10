@@ -18,6 +18,7 @@ const groupPostsModel = require('./group/groupPosts')
 
 
 
+const ratingModel = require('./rating/rating')
 const QuestionAnswerModel = require('./questionAnswer/questionAnswer')
 const commentsModel = require('./questionAnswer/comments')
 const diseaseModel = require('../models/diseaseControl/diseaseControl')
@@ -34,13 +35,14 @@ const sequelize = new Sequelize(DBURL)
 let physician = physicianModel(sequelize, DataTypes);
 let patients = patientModel(sequelize, DataTypes);
 let group = groupModel(sequelize, DataTypes);
-let groupPosts= groupPostsModel(sequelize, DataTypes);
+let groupPosts = groupPostsModel(sequelize, DataTypes);
 let appointment = appointmentModel(sequelize, DataTypes);
 let QuestionAnswer = QuestionAnswerModel(sequelize, DataTypes);
 let comments = commentsModel(sequelize, DataTypes);
 let diseases = diseaseModel(sequelize, DataTypes);
 let prescriptions = prescriptionModel(sequelize, DataTypes);
 let vitals = vitalsModel(sequelize, DataTypes);
+let rating = ratingModel(sequelize, DataTypes);
 
 
 
@@ -51,8 +53,8 @@ let vitals = vitalsModel(sequelize, DataTypes);
 //---------------------------------------------------------------------------------------------------------
 //patient - history relation
 
-patients.hasOne(diseases,{ as:'History', foreignKey:'patientUN', sourceKey:'username'})
-diseases.belongsTo(patients,{foreignKey:'patientUN', targetKey:'username'})
+patients.hasOne(diseases, { as: 'History', foreignKey: 'patientUN', sourceKey: 'username' })
+diseases.belongsTo(patients, { foreignKey: 'patientUN', targetKey: 'username' })
 
 // //physician - history relation
 
@@ -65,8 +67,8 @@ diseases.belongsTo(physician, { as: 'CreatedBy', foreignKey: 'physicianUN', targ
 
 // patient - prescription relation
 
-patients.hasMany(prescriptions,{ as:'Prescriptions', foreignKey:'patientName', sourceKey:'username'})
-prescriptions.belongsTo(patients,{foreignKey:'patientName', targetKey:'username'})
+patients.hasMany(prescriptions, { as: 'Prescriptions', foreignKey: 'patientName', sourceKey: 'username' })
+prescriptions.belongsTo(patients, { foreignKey: 'patientName', targetKey: 'username' })
 
 //physician - prescription relation
 
@@ -80,8 +82,8 @@ prescriptions.belongsTo(physician, { as: 'PrescribedBy', foreignKey: 'physicianN
 
 //Question Posts - comments relations
 
-QuestionAnswer.hasMany(comments, {as : 'Comments',foreignKey: 'postID', sourceKey: 'id'});
-comments.belongsTo(QuestionAnswer, {foreignKey: 'postID', targetKey: 'id'})
+QuestionAnswer.hasMany(comments, { as: 'Comments', foreignKey: 'postID', sourceKey: 'id' });
+comments.belongsTo(QuestionAnswer, { foreignKey: 'postID', targetKey: 'id' })
 
 
 
@@ -96,9 +98,9 @@ group.belongsTo(physician, { foreignKey: 'physicianUN', targetKey: 'username', a
 
 // // relation one to many between group & patients
 
-patients.belongsToMany(group, {as : 'Group',through: 'patients_group' , foreignKey: 'patientId' })
+patients.belongsToMany(group, { as: 'Group', through: 'patients_group', foreignKey: 'patientId' })
 
-group.belongsToMany(patients, {as : 'Member',through: 'patients_group' , foreignKey: 'groupId' })
+group.belongsToMany(patients, { as: 'Member', through: 'patients_group', foreignKey: 'groupId' })
 
 // // relations between group & groupPosts
 
@@ -120,16 +122,16 @@ appointment.belongsTo(physician, { foreignKey: 'physicianUsername', targetKey: '
 //---------------------------------------------------------------------------------------------------------------
 //physician - patient relation
 
-physician.belongsToMany(patients,{as:'Subscriber', foreignKey:'physiciantUN',through: "subscriptions"})
-patients.belongsToMany(physician,{as: 'Subscription',foreignKey:'patientUN',through: "subscriptions"})
+physician.belongsToMany(patients, { as: 'Subscriber', foreignKey: 'physiciantUN', through: "subscriptions" })
+patients.belongsToMany(physician, { as: 'Subscription', foreignKey: 'patientUN', through: "subscriptions" })
 
 //--------------------------------------------------------------------------------------- Vitls Relations
 //---------------------------------------------------------------------------------------------------------------
 
 //patient - vitals relation
 
-patients.hasMany(vitals,{as:'VitalsRecord', foreignKey:'patientUN',sourceKey: "username"})
-vitals.belongsTo(patients,{as: 'DoneBy',foreignKey:'patientUN',targetKey: "username"})
+patients.hasMany(vitals, { as: 'VitalsRecord', foreignKey: 'patientUN', sourceKey: "username" })
+vitals.belongsTo(patients, { as: 'DoneBy', foreignKey: 'patientUN', targetKey: "username" })
 
 
 
@@ -145,7 +147,8 @@ module.exports = {
     vital: new Collection(vitals),
     appointment: new Collection(appointment),
     Comment: new Collection(comments),
-    groupPosts: new Collection(groupPosts)
+    groupPosts: new Collection(groupPosts),
+    rating: new Collection(rating)
 };
 
 
