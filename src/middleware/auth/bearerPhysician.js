@@ -4,11 +4,15 @@ const {physician} = require("../../models");
 
 module.exports = async (req, res, next) => {
   try {
-    if (!req.headers.authorization) {
+    let token;
+
+    if (req.headers.authorization) {
+      token = req.headers.authorization.split(" ").pop();
+    } else if (req.cookies.authToken) {
+      token = req.cookies.authToken;
+    } else {
       _authError();
     }
-
-    const token = req.headers.authorization.split(" ").pop();
 
     const validUser = await physician.model.authenticateToken(token);
     req.user = validUser;

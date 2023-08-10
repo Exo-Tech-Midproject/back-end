@@ -6,7 +6,7 @@ function handleGroupPosts(sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        groupID:{
+        groupId:{
             type: DataTypes.INTEGER,
             allowNull: false
         },
