@@ -153,7 +153,15 @@ async function  patientProfileGetHandlder (req, res, next){
         if (!userProfile) {
             return res.status(404).json({ error: 'User not found' });
         } else {
-            res.status(200).json(userProfile);
+            let result = {
+                username:userProfile.username,
+                fullName:userProfile.fullName,
+                gender:userProfile.gender,
+                birthdate:userProfile.birthdate,
+                race:userProfile.race,
+                maritalStatus:userProfile.maritalStatus
+            }
+            res.status(200).json(result);
         }
     }catch(err){
         next(err)
