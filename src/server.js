@@ -48,6 +48,12 @@ io.on('connection', (socket) => {
 })
 
 
+let vitalsNotification = io.of('/notifications')
+
+vitalsNotification.on('connection', (socket) => {
+socket.on('problem')
+})
+
 //-------------------
 
 // require('dotenv').config();

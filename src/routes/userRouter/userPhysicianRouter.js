@@ -7,8 +7,9 @@ const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
 
 
 
-const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts, messages} = require('../../models');
+const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts, messages, notification} = require('../../models');
 const { Op } = require('sequelize');
+const e = require('express');
 
 
 
@@ -86,6 +87,8 @@ physicianRouter.delete('/physician/:username/chat/:patientUN/:msgID',bearerAuthp
 physicianRouter.put('/physician/:username/chat/:patientUN/:msgID',bearerAuthphysician, editMessagesFromphysician)
 
 
+// Physician Notifications routes
+physicianRouter.get('/physician/:username/notifications',bearerAuthphysician, getAllNotifications)
 
 
 
@@ -227,7 +230,7 @@ async function physicianProfileUpdateHandlder(req, res, next) {
         if (!updateProfile) {
             return res.status(404).json({ error: 'Access denied' });
         } else {
-            res.status(200).json(updateProfile);
+            res.status(202).json(updateProfile);
         }
     } catch (err) {
         next(err)
@@ -1359,8 +1362,48 @@ async function delMessagesFromphysician(req,res,next) {
     }
 }
 
+//----------------------------------------------------------------- Notification  handlers
+//---------------------------------------------------------------------------------
+async function getAllNotifications(req, res, next){
+    try {
 
+    const {username} = req.params
 
+    let currentPhysician = await physician.model.findOne({
+      where:{
+        username:username
+      }
+    })
+
+    let subscribers = await currentPhysician.getSubscriber()
+
+    // console.log(subscribers[0])
+    let finalArr = [];
+    let arr = await Promise.all(subscribers.map(async subscriber => {
+        let subNotifications = await notification.model.findAll({
+            where: {
+                patientUN: subscriber.username
+            }
+        })
+        // let obj = {
+        //     username: subscriber.username,
+        //     notifications: subNotifications
+        // }
+        return subNotifications;
+    }));
+    let arr2 = arr.forEach(element => {
+        finalArr.push(...element)
+    })
+    
+    
+   
+    //   console.log(arr)
+      res.status(200).json(finalArr)
+
+    }catch(err){
+        next(err)
+    }
+  }
 
 module.exports = physicianRouter;
 

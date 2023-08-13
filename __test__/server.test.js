@@ -18,7 +18,8 @@ beforeAll(async () => {
 afterAll(async () => {
     await db.drop();
 });
-
+            let token = '';
+            let token2 = ''
 describe("testing the server", () => {
     it("POST to /signup/:model to create a new user.", async () => {
         const res = await req.post("/signup/physician").send({
@@ -33,10 +34,28 @@ describe("testing the server", () => {
             nationalID: "1asd",
             department: "ENT",
         });
-
+        token = res.body.user.token
         expect(res.status).toBe(201);
         expect(res.body.user.username).toEqual("Hasan1");
         expect(await bcrypt.compare("12asd31", res.body.user.password)).toEqual(true);
+    });
+    it("POST to /signup/:model to create a new user.", async () => {
+        const res = await req.post("/signup/patient").send({
+            username: "test2",
+            fullName: "testtest2",
+            password: "123456",
+            gender: "male",
+            birthdate: "1998-08-01",
+            race: "white",
+            maritalStatus:"single" ,
+            mobileNumber:"1234" ,
+            emailAddress: "test2@gmail.com"
+            
+          });
+        token2 = res.body.user.token
+        expect(res.status).toBe(201);
+        expect(res.body.user.username).toEqual("test2");
+        expect(await bcrypt.compare("123456", res.body.user.password)).toEqual(true);
     });
     it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
         const res = await req
@@ -47,6 +66,15 @@ describe("testing the server", () => {
         expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
         expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
     });
+    it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .post("/login/patient")
+        .set("Authorization", `Basic ${await base64.encode("test2:123456")}`);
+
+        // console.log(res.request._header.authorization); // Log the authorization header value
+        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        expect(res.request._header.authorization).toBe("Basic dGVzdDI6MTIzNDU2");
+    });
 
     it("404 on a bad route", async () => {
         const res = await req.get("/pageNotFound");
@@ -56,6 +84,65 @@ describe("testing the server", () => {
     it("500 on a invalid model", async () => {
         const res = await req.get("/patient/abdullah/profile");
         expect(res.status).toBe(500);
+    });
+
+    it("get to /physician/:username/profile to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/profile")
+        .set("Authorization", `Bearer ${token}`);
+
+        // console.log(res.request._header.authorization); // Log the authorization header value
+        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+    });
+    it("get to /physician/:username/profile to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/patient/test2/profile")
+        .set("Authorization", `Bearer ${token2}`);
+
+        // console.log(res.request._header.authorization); // Log the authorization header value
+        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+    });
+    it("put to /physician/:username/profile .", async () => {
+        const res = await req
+        .put("/physician/Hasan1/profile").send({
+            username: "Hasan1",
+            password: "12asd31",
+            fullName: "Hasantest",
+            licenseId: 123444,
+            gender: "male",
+            birthDate: "1996-08-07",
+            mobileNumber: "13231",
+            emailAddress: "hasasdad1@gmail.com",
+            nationalID: "1asd",
+            department: "ENT",
+        })
+        .set("Authorization", `Bearer ${token}`);
+
+        // console.log(res.request._header.authorization); // Log the authorization header value
+        expect(res.status).toBe(202); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+    });
+    it("put to /patient/:username/profile .", async () => {
+        const res = await req
+        .put("/patient/test2/profile").send({
+            username: "test2",
+            fullName: "testtest22",
+            password: "123456",
+            gender: "male",
+            birthdate: "1998-08-01",
+            race: "white",
+            maritalStatus:"single" ,
+            mobileNumber:"1234" ,
+            emailAddress: "test2@gmail.com"
+            
+          })
+        .set("Authorization", `Bearer ${token2}`);
+
+        // console.log(res.request._header.authorization); // Log the authorization header value
+        expect(res.status).toBe(202); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
     });
 });
 
