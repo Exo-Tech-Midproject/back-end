@@ -227,7 +227,7 @@ async function physicianProfileUpdateHandlder(req, res, next) {
         if (!updateProfile) {
             return res.status(404).json({ error: 'Access denied' });
         } else {
-            res.status(200).json(updateProfile);
+            res.status(202).json(updateProfile);
         }
     } catch (err) {
         next(err)
@@ -286,7 +286,7 @@ async function getAllAppointmentOfPatient(req, res, next) {
         if (physicianFound) {
 
             const appointments = await appointment.model.findAll({ where: { physicianUsername: username } })   
-            return res.status(201).json(appointments);
+            return res.status(200).json(appointments);
 
         } else throw new Error(`Physician isn't found`)
     } catch (err) {
@@ -379,7 +379,7 @@ try {
                 let dateTosendBack = appointments.date;
                 console.log(dateTosendBack)
                  appointment.delete(id)
-                return res.status(200).json(`Appointment with id ${id} and date of ${dateTosendBack} has been deleted`);
+                return res.status(204).json(`Appointment with id ${id} and date of ${dateTosendBack} has been deleted`);
             } else throw new Error(`Appointment doesn't exist`)
 
         } else throw new Error(`This patient didn't subscribe for you`)
@@ -549,7 +549,7 @@ async function deleteGroup(req, res,next) {
         
         let deletedGroup = await group.delete(id)
 
-        res.status(200).json(`Group with name : ${groupsFound.groupName} has deleted successfully`)
+        res.status(204).json(`Group with name : ${groupsFound.groupName} has deleted successfully`)
     }catch(err){
         next(err)
     }

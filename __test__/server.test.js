@@ -19,7 +19,11 @@ afterAll(async () => {
     await db.drop();
 });
 
+let token = '';
+let token2 = '';
+
 describe("testing the server", () => {
+    // ---------------- signup ---------------
     it("POST to /signup/:model to create a new user.", async () => {
         const res = await req.post("/signup/physician").send({
             username: "Hasan1",
@@ -33,21 +37,238 @@ describe("testing the server", () => {
             nationalID: "1asd",
             department: "ENT",
         });
-
+        token = res.body.user.token
         expect(res.status).toBe(201);
         expect(res.body.user.username).toEqual("Hasan1");
         expect(await bcrypt.compare("12asd31", res.body.user.password)).toEqual(true);
     });
+
+    it("POST to /signup/:model to create a new user.", async () => {
+        const res = await req.post("/signup/patient").send({
+            username: "test2",
+            fullName: "testtest2",
+            password: "123456",
+            gender: "male",
+            birthdate: "1998-08-01",
+            race: "white",
+            maritalStatus:"single" ,
+            mobileNumber:"1234" ,
+            emailAddress: "test2@gmail.com"
+
+        });
+        token2 = res.body.user.token
+        expect(res.status).toBe(201);
+        expect(res.body.user.username).toEqual("test2");
+        expect(await bcrypt.compare("123456", res.body.user.password)).toEqual(true);
+    });
+
+     // ---------------- login ---------------
     it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
         const res = await req
         .post("/login/physician")
         .set("Authorization", `Basic ${await base64.encode("Hasan1:12asd31")}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        
+        expect(res.status).toBe(200);
         expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
     });
 
+    it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .post("/login/patient")
+        .set("Authorization", `Basic ${await base64.encode("test2:123456")}`);
+
+        
+        expect(res.status).toBe(200); 
+        expect(res.request._header.authorization).toBe("Basic dGVzdDI6MTIzNDU2");
+    });
+
+ // ---------------- profile ---------------
+    it("get to /physician/:username/profile to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/profile")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+    it("get to /physician/:username/profile to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/patient/test2/profile")
+        .set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(200);
+    });
+    it("put to /physician/:username/profile .", async () => {
+        const res = await req
+        .put("/physician/Hasan1/profile").send({
+            username: "Hasan1",
+            password: "12asd31",
+            fullName: "Hasantest",
+            licenseId: 123444,
+            gender: "male",
+            birthDate: "1996-08-07",
+            mobileNumber: "13231",
+            emailAddress: "hasasdad1@gmail.com",
+            nationalID: "1asd",
+            department: "ENT",
+        })
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(202);
+    });
+    it("put to /patient/:username/profile .", async () => {
+        const res = await req
+        .put("/patient/test2/profile").send({
+            username: "test2",
+            fullName: "testtest22",
+            password: "123456",
+            gender: "male",
+            birthdate: "1998-08-01",
+            race: "white",
+            maritalStatus:"single" ,
+            mobileNumber:"1234" ,
+            emailAddress: "test2@gmail.com"
+
+        })
+        .set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(202);
+    });
+
+     // ---------------- physician subscribe ---------------
+    it("get to /physician/:username/patients/:patientUN/subscribe to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/subscribe")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+
+    it("get to /physician/Hasan1/patients/subscribersto login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/subscribers")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+
+     // ---------------- patient subscribe ---------------
+    it("get to /patient/test2/physicians/subscriptions to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/patient/test2/physicians/subscriptions")
+        .set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(200);
+    });
+
+     // ---------------- physician appointments ---------------
+
+    // it("POST to /physician/:username/patients/:patientUN/appointments", async () => {
+    //     const res = await req.post("/physician/Hasan1/patients/test2/appointments").send({
+    //         date: "7-8-2023",
+    //     }).set("Authorization", `Bearer ${token}`);
+
+    //     expect(res.status).toBe(201);
+    // })
+
+    it("get to /physician/:username/patients/:patientUN/appointments", async () => {
+        const res = await req  .get("/physician/Hasan1/patients/test2/appointments")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+
+    it("get to /physician/:username/appointments", async () => {
+        const res = await req  .get("/physician/Hasan1/appointments")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+
+    // it("delete to /physician/:username/patients/:patientUN/appointments/:id", async () => {
+    //     const res = await req  .delete("/physician/Hasan1/patients/test2/appointments/1")
+    //     .set("Authorization", `Bearer ${token}`);
+
+    //     expect(res.status).toBe(204);
+    // });
+
+     // ---------------- physician groups ---------------
+
+    it("post to /physician/:username/groups", async () => {
+        const res = await req
+        .post("/physician/Hasan1/groups").send({
+            groupName:"group1",
+            physicianUN:"Hasan1"
+        })
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(201);
+    });
+
+    it("post to /physician/:username/patients/:patientUN/addtogroup/:groupName", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test2/addtogroup/group1")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(201);
+    });
+
+    it("get to /physician/:username/groups", async () => {
+        const res = await req
+        .get("/physician/Hasan1/groups")
+        .set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(200);
+    });
+
+    it("get to /physician/:username/groups/:id", async () => {
+        const res = await req
+        .get("/physician/Hasan1/groups/1")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+
+    it("put to /physician/:username/groups/:id", async () => {
+        const res = await req
+        .put("/physician/Hasan1/groups/1").send({
+            groupName:"group2",
+            physicianUN:"Hasan1"
+        })
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(202);
+    });
+
+     // ---------------- patient Groups ---------------
+
+     it("get to /patient/:username/groups", async () => {
+        const res = await req
+        .get("/patient/test2/groups")
+        .set("Authorization", `Bearer ${token2}`);
+        
+        expect(res.status).toBe(200);
+    });
+
+    it("get to /patient/:username/groups/:groupName", async () => {
+        const res = await req
+        .get("/patient/test2/groups/group2")
+        .set("Authorization", `Bearer ${token2}`);
+        
+        expect(res.status).toBe(200);
+    });
+
+     // ---------------- Delete Groups ---------------
+
+    it("delete to /physician/:username/groups/:id", async () => {
+        const res = await req
+        .delete("/physician/Hasan1/groups/1")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(204);
+    });
+
+     // ---------------- errors ---------------
     it("404 on a bad route", async () => {
         const res = await req.get("/pageNotFound");
         expect(res.status).toBe(404);
@@ -57,6 +278,7 @@ describe("testing the server", () => {
         const res = await req.get("/patient/abdullah/profile");
         expect(res.status).toBe(500);
     });
+
 });
 
 describe("MethodCollection", () => {

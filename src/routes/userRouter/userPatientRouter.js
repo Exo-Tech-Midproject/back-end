@@ -193,7 +193,7 @@ async function  patientProfileUpdateHandlder (req, res, next){
         if (!updateProfile) {
             return res.status(404).json({ error: 'Access denied' });
         } else {
-            res.status(200).json(updateProfile);
+            res.status(202).json(updateProfile);
         }
     }catch(err){
         next(err)
