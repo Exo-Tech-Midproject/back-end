@@ -203,7 +203,14 @@ async function  physicianProfileGetHandlder (req, res, next){
         if (!userProfile) {
             return res.status(404).json({ error: 'User not found' });
         } else {
-            res.status(200).json(userProfile);
+            let result = {
+                username:userProfile.username,
+                fullName:userProfile.fullName,
+                gender:userProfile.gender,
+                birthdate:userProfile.birthdate,
+                department:userProfile.department,
+            }
+            res.status(200).json(result);
         }
     }catch(err){
         next(err)
@@ -1195,6 +1202,7 @@ async function addComments(req, res, next) {
   
 
 
+
 //----------------------------------------------------------------- Chat handlers
 //---------------------------------------------------------------------------------
 async function getAllmessagesforphysician(req,res,next) {
@@ -1350,6 +1358,7 @@ async function delMessagesFromphysician(req,res,next) {
         next(err)
     }
 }
+
 
 
 
