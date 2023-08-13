@@ -7,7 +7,7 @@ const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
 
 
 
-const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts, messages} = require('../../models');
+const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts,rating, messages} = require('../../models');
 const { Op } = require('sequelize');
 
 
@@ -86,7 +86,8 @@ physicianRouter.delete('/physician/:username/chat/:patientUN/:msgID',bearerAuthp
 physicianRouter.put('/physician/:username/chat/:patientUN/:msgID',bearerAuthphysician, editMessagesFromphysician)
 
 
-
+// physician  Rate routes
+physicianRouter.get('/physician/:username/rating/',bearerAuthphysician, getAllRating)
 
 
 
@@ -1359,6 +1360,31 @@ async function delMessagesFromphysician(req,res,next) {
     }
 }
 
+//----------------------------------------------------------------- rate handlers
+//---------------------------------------------------------------------------------
+
+async function getAllRating(req,res,next) {
+    try{
+        
+    
+        const {username} = req.params
+    
+        let allRating = await rating.model.findAll({
+            where: {
+                physician: username
+            }
+        });
+        const averageRating = await rating.getAverageRating         
+        console.log(averageRating)
+          if(!allRating[0]) throw new Error(`You don't have Rating yet!`)
+    
+            res.status(200).json(allRating)
+        }catch(err){
+            next(err)
+        }
+
+    
+}
 
 
 

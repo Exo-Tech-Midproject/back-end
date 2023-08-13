@@ -139,16 +139,16 @@ async function logInPageHandlerPhysician(req, res, next){
     // const response = {
     //     message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
     //     forPhysician: {
-    //         "username": "Your Username",
-    //         "fullName": "Your fullname",
-    //         "password": "Yourpassword",
-    //         "licenseId": "Your licenseID",
-    //         "gender": "Your gender (male/female)",
-    //         "birthDate": "Your birthday as (Year-month-day)",
-    //         "mobileNumber": "Your mobile Number",
-    //         "emailAddress": "Your Email",
-    //         "nationalID": "Your National ID",
-    //         "department": "The department you work in"
+            // "username": "Your Username",
+            // "fullName": "Your fullname",
+            // "password": "Yourpassword",
+            // "licenseId": "Your licenseID",
+            // "gender": "Your gender (male/female)",
+            // "birthDate": "Your birthday as (Year-month-day)",
+            // "mobileNumber": "Your mobile Number",
+            // "emailAddress": "Your Email",
+            // "nationalID": "Your National ID",
+            // "department": "The department you work in"
     //     },
     //     forPatient: {
     //         "username": "Your Username",

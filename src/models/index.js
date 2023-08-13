@@ -136,7 +136,14 @@ patients.belongsToMany(physician, { as: 'Subscription', foreignKey: 'patientUN',
 patients.hasMany(vitals, { as: 'VitalsRecord', foreignKey: 'patientUN', sourceKey: "username" })
 vitals.belongsTo(patients, { as: 'DoneBy', foreignKey: 'patientUN', targetKey: "username" })
 
+//--------------------------------------------------------------------------------------- Rating Relations
+//---------------------------------------------------------------------------------------------------------------
 
+physician.hasMany(rating, { as: 'Rating', foreignKey: 'physician', sourceKey: "username" })
+rating.belongsTo(physician, { as: 'RatedBy', foreignKey: 'physician', targetKey: "username" })
+
+patients.hasMany(rating, { as: 'CreatedRating', foreignKey: 'patient', sourceKey: "username" })
+rating.belongsTo(patients, { as: 'CraetedBy', foreignKey: 'patient', targetKey: "username" })
 
 //---------------------------------------------------------
 module.exports = {
