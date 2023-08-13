@@ -4,9 +4,53 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const morgan = require('morgan');
+const moment = require('moment')
+
+//------ new work 
+const http = require('http')
+const { Server } = require("socket.io");
+const server = http.createServer(app)
+const io = new Server(server);
+
+
+
+io.on('connection', (socket) => {
+    console.log(`socket with id ${socket.id} is connected`)
+    socket.on('enter chat' , (payload) => {
+        let socketName = payload.username
+        let socketTime = moment().format('h:mm a')
+        
+        socket.join(`${payload.roomName}`)
+        let obj = {
+            msg:`${socketName} is  Online`,
+            name: payload.username,
+            time: socketTime
+          }
+        socket.broadcast.to(payload.roomName).emit('chat message',obj)
+        socket.on('chat message', (msg) => {
+            io.to(payload.roomName).emit('chat message', msg);
+        })
+        
+        socket.on('disconnect', () => {
+            let obj = {
+                msg:`${socketName} is Offline`,
+                name: payload.username,
+                time: socketTime
+              }
+            io.to(payload.roomName).emit('chat message',obj)
+        })
+    })
+    
+    
+    socket.on('left-chat' ,(payload) => {
+        console.log(payload,'aaaaaaaaaaaaaa')
+    })
+})
+
+
+//-------------------
 
 // require('dotenv').config();
-
 const errorHandler = require('./error-handlers/500');
 const notFound = require('./error-handlers/404');
 const cookieParser = require('cookie-parser');
@@ -46,9 +90,12 @@ app.use(notFound);
 app.use(errorHandler);
 
 
-function start(port) {
-    app.listen(port, () => console.log(`up and running on port ${port}`))
+//----------- New Work 
+//--------------------
 
+function start(port) {
+    server.listen(port, () => console.log(`up and running on port ${port}`))
+    
 }
 
 module.exports = { start, app }

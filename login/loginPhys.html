@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physician Login</title>
+  <style>
+    body {
+      background: linear-gradient(to right, #efe8cb, #5c0a11);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-container {
+      width: 400px;
+      padding: 40px;
+      background-color: rgba(255, 255, 255, 0.9);
+      border-radius: 10px;
+      box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .login-heading {
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+    .login-form input[type="text"],
+    .login-form input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #f1f1f1;
+    }
+    .login-form button {
+      width: 100%;
+      padding: 12px;
+      background-color: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .login-form button:hover {
+      background-color: #2980b9;
+    }
+  </style>
+</head>
+<body>
+    <div class="login-container">
+      <h2 class="login-heading">Physician Login</h2>
+      <form class="login-form">
+        <input type="text" placeholder="Username">
+        <input type="password" placeholder="Password">
+        <button type="submit">Login</button>
+      </form>
+      <p id="error-message" class="error-message" style="color: red;"></p>
+    </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const loginForm = document.querySelector('.login-form');
+      const errorMessage = document.getElementById('error-message');
+  
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+  
+        const username = loginForm.querySelector('input[type="text"]').value;
+        const password = loginForm.querySelector('input[type="password"]').value;
+        const credentials = `${username}:${password}`;
+        const base64Credentials = btoa(credentials);
+  
+        try {
+          const response = await axios.post('http://localhost:3000/login/physician', null, {
+            headers: {
+              'Authorization': `Basic ${base64Credentials}`
+            }
+          });
+          console.log(response)
+          if (response.status === 200) {
+            
+            window.location.href = `http://localhost:3000/physician/${username}/chat`;
+          } else {
+            
+            errorMessage.textContent = 'Invalid login credentials';
+          }
+        } catch (error) {
+          console.error('An error occurred:', error);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

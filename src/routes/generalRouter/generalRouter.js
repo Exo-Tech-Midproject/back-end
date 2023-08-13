@@ -5,7 +5,15 @@ const generalRouter = express.Router();
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const bearerAuthPatient = require('../../middleware/auth/bearerPatient')
+const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
 
+
+//-------------------- new work
+// const io = require('socket.io')(3000)
+// const http = require('http')
+
+//----------------------------
 // resetToken generator function
 function generateResetToken() {
     const resetToken = crypto.randomBytes(32).toString('hex');
@@ -34,10 +42,16 @@ async function sendResetEmail(emailAddress, resetToken) {
 }
 
 
-const { group , physician , patient, appointment} = require('../../models')
+const { group , physician , patient, appointment} = require('../../models');
+const path = require('path');
 
 generalRouter.get('/', homePageHandler)
-generalRouter.get('/login', logInPageHandler)
+generalRouter.get('/patient/:username/chat', bearerAuthPatient, chatPageHandler)
+generalRouter.get('/patient/:username/chat/with/:targetchat', bearerAuthPatient, targetedChatpage)
+generalRouter.get('/physician/:username/chat', bearerAuthphysician, chatPageHandlerPhys)
+generalRouter.get('/physician/:username/chat/with/:targetchat', bearerAuthphysician, targetedChatpagePhys)
+generalRouter.get('/patient/login', logInPageHandlerPatient)
+generalRouter.get('/physician/login', logInPageHandlerPhysician)
 generalRouter.get('/signup',signUpPageHandler);
 generalRouter.post('/patient/forgotpassword/:username',handleForgotPasswordPatient)
 generalRouter.post('/physician/forgotpassword/:username',handleForgotPasswordPhysician)
@@ -52,6 +66,30 @@ generalRouter.post('/physician/resetpassword/:username',handleResetPasswordPhysi
 async function homePageHandler (req, res, next){
     res.status(200).json("Welcome to Home Page")
 }
+
+//--- chat test Hasan
+async function chatPageHandler (req, res, next){
+    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'ChooseChat', 'picktochat.html');
+    res.sendFile(chatHtmlPath)
+
+}
+async function targetedChatpage (req, res, next){
+    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'chatHtml', 'chat.html');
+    res.sendFile(chatHtmlPath)
+
+}
+async function chatPageHandlerPhys (req, res, next){
+    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'ChooseChat', 'picktoChatPhys.html');
+    res.sendFile(chatHtmlPath)
+
+}
+async function targetedChatpagePhys (req, res, next){
+    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'chatHtml', 'chatPhys.html');
+    res.sendFile(chatHtmlPath)
+
+}
+//--- chat test Hasan
+
 async function signUpPageHandler (req, res, next){
     const welcomeMessage = `
     Welcome to the Signup Page!
@@ -60,38 +98,79 @@ async function signUpPageHandler (req, res, next){
     res.send(welcomeMessage);
 }
 
-async function logInPageHandler(req, res, next){
-    const response = {
-        message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
-        forPhysician: {
-            "username": "Your Username",
-            "fullName": "Your fullname",
-            "password": "Yourpassword",
-            "licenseId": "Your licenseID",
-            "gender": "Your gender (male/female)",
-            "birthDate": "Your birthday as (Year-month-day)",
-            "mobileNumber": "Your mobile Number",
-            "emailAddress": "Your Email",
-            "nationalID": "Your National ID",
-            "department": "The department you work in"
-        },
-        forPatient: {
-            "username": "Your Username",
-            "fullName": "Your fullname",
-            "password": "Yourpassword",
-            "gender": "Your gender (male/female)",
-            "birthdate": "Your birthday as (Year-month-day)",
-            "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
+async function logInPageHandlerPatient(req, res, next){
+    // const response = {
+    //     message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
+    //     forPhysician: {
+    //         "username": "Your Username",
+    //         "fullName": "Your fullname",
+    //         "password": "Yourpassword",
+    //         "licenseId": "Your licenseID",
+    //         "gender": "Your gender (male/female)",
+    //         "birthDate": "Your birthday as (Year-month-day)",
+    //         "mobileNumber": "Your mobile Number",
+    //         "emailAddress": "Your Email",
+    //         "nationalID": "Your National ID",
+    //         "department": "The department you work in"
+    //     },
+    //     forPatient: {
+    //         "username": "Your Username",
+    //         "fullName": "Your fullname",
+    //         "password": "Yourpassword",
+    //         "gender": "Your gender (male/female)",
+    //         "birthdate": "Your birthday as (Year-month-day)",
+    //         "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
 
-            "maritalStatus":"Your maritalStatus as single/married" ,
-            "mobileNumber":"Your mobile Number" ,
-            "emailAddress": "Your Email"   
-        }
+    //         "maritalStatus":"Your maritalStatus as single/married" ,
+    //         "mobileNumber":"Your mobile Number" ,
+    //         "emailAddress": "Your Email"   
+    //     }
         
 
-    }
+    // }
 
-    res.status(200).json(response);
+    // res.status(200).json(response);
+
+    //-------------- new work 
+    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'login', 'login.html');
+    res.sendFile(chatHtmlPath)
+};
+async function logInPageHandlerPhysician(req, res, next){
+    // const response = {
+    //     message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
+    //     forPhysician: {
+    //         "username": "Your Username",
+    //         "fullName": "Your fullname",
+    //         "password": "Yourpassword",
+    //         "licenseId": "Your licenseID",
+    //         "gender": "Your gender (male/female)",
+    //         "birthDate": "Your birthday as (Year-month-day)",
+    //         "mobileNumber": "Your mobile Number",
+    //         "emailAddress": "Your Email",
+    //         "nationalID": "Your National ID",
+    //         "department": "The department you work in"
+    //     },
+    //     forPatient: {
+    //         "username": "Your Username",
+    //         "fullName": "Your fullname",
+    //         "password": "Yourpassword",
+    //         "gender": "Your gender (male/female)",
+    //         "birthdate": "Your birthday as (Year-month-day)",
+    //         "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
+
+    //         "maritalStatus":"Your maritalStatus as single/married" ,
+    //         "mobileNumber":"Your mobile Number" ,
+    //         "emailAddress": "Your Email"   
+    //     }
+        
+
+    // }
+
+    // res.status(200).json(response);
+
+    //-------------- new work 
+    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'login', 'loginPhys.html');
+    res.sendFile(chatHtmlPath)
 };
 
 
