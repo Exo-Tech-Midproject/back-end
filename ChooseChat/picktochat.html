@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Application</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #3498db, #8e44ad);
+      font-family: Arial, sans-serif;
+      color: #fff;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .user-list-container {
+      max-width: 400px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+    .user-list-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .user-list-item:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    .user-list-item label {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .start-chat-button {
+      background-color: #27ae60;
+      border-color: #27ae60;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .start-chat-button:hover {
+      background-color: #219952;
+    }
+  </style>
+</head>
+<body>
+  <div class="user-list-container">
+    <h2>Select a Contact to Start Chat</h2>
+    
+    <button class="start-chat-button">Start Chat</button>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    
+    const username = window.location.pathname.split('/')[2]    
+    async function getUsers() {
+      try {
+        const response = await axios.get(`/patient/${username}/physicians/subscriptions`);
+        return response.data; 
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        return []; 
+      }
+    }
+
+    async function populateUserList() {
+      const users = await getUsers();
+      const userContainer = document.querySelector('.user-list-container');
+
+      
+      for (const user of users) {
+          const userListItem = document.createElement('div');
+          userListItem.className = 'user-list-item';
+          
+          const userRadioButton = document.createElement('input');
+          userRadioButton.type = 'radio';
+          userRadioButton.name = 'user';
+          userRadioButton.id = user.username;
+          userRadioButton.value = user.username;
+          
+          const userLabel = document.createElement('label');
+          userLabel.setAttribute('for', user.username);
+          userLabel.textContent = user.fullName;
+          
+          userListItem.appendChild(userRadioButton);
+          userListItem.appendChild(userLabel);
+          
+          userContainer.insertBefore(userListItem, startChatButton);
+        }
+        console.log(users)
+    }
+    const startChatButton = document.querySelector('.start-chat-button');
+
+    startChatButton.addEventListener('click', () => {
+      const selectedUser = document.querySelector('input[name="user"]:checked');
+      if (selectedUser) {
+        
+        const selectedUsername = selectedUser.value;
+        window.location.href = `/patient/${username}/chat/with/${selectedUsername}`;
+      }
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+      populateUserList();
+    });
+  </script>
+</body>
+</html>

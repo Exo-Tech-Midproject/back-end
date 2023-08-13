@@ -7,7 +7,9 @@ const bearerAuthPatient = require('../../middleware/auth/bearerPatient')
 
 
 
-const { group , physician , patient, appointment, vital , disease , prescription ,QuestionAnswer ,Comment, groupPosts} = require('../../models')
+const { group , physician , patient, appointment, vital , disease , prescription ,QuestionAnswer ,Comment, groupPosts, messages} = require('../../models');
+const { Op } = require('sequelize');
+
 
 
 
@@ -26,6 +28,7 @@ patientRouter.get('/patient/:username/physicians/subscriptions',bearerAuthPatien
 // patient profile routes
 patientRouter.get('/patient/:username/profile', bearerAuthPatient , patientProfileGetHandlder)
 patientRouter.put('/patient/:username/profile', bearerAuthPatient , patientProfileUpdateHandlder)
+
 
 // patient Appointment routes
 patientRouter.get('/patient/:username/appointments', bearerAuthPatient ,getAllAppointmentsForPatient)
@@ -62,6 +65,14 @@ patientRouter.get('/patient/:username/Q&A', bearerAuthPatient,getAllQApostsByPat
 patientRouter.get('/patient/:username/Q&A/:id',bearerAuthPatient, getOneQApostByPatientbyId)
 patientRouter.put('/patient/:username/Q&A/:id', bearerAuthPatient, updateOneQApostByPatientbyId)
 patientRouter.delete('/patient/:username/Q&A/:id',bearerAuthPatient, deleteOneQApostByPatientbyId)
+
+// Chat routes 
+
+
+patientRouter.get('/patient/:username/chat/:physicianUN',bearerAuthPatient, getAllmessagesforPatient)
+patientRouter.post('/patient/:username/chat/:physicianUN',bearerAuthPatient, postMessagesFromPatient)
+patientRouter.delete('/patient/:username/chat/:physicianUN/:msgID',bearerAuthPatient, delMessagesFromPatient)
+patientRouter.put('/patient/:username/chat/:physicianUN/:msgID',bearerAuthPatient, editMessagesFromPatient)
 
 
 
@@ -101,9 +112,11 @@ async function  loginPatientHandler (req, res, next){
         };
         const authToken = user.token;
         console.log(authToken);
+        console.log(req.user.username);
     
       res.cookie('authToken', authToken, { maxAge: 86400000 ,httpOnly: true,path: '/'}); // 1 day expiration
-      res.status(200).json(user);
+    //   res.redirect(`/patient/${req.user.username}/profile`);
+      res.status(200).json(user);    
     } catch (e) {
         next(e.message)
     }
@@ -113,6 +126,7 @@ async function logoutHandler(req, res) {
     res.cookie('authToken', '', { maxAge: 1 });
     res.redirect('/');
   };
+
 //----------------------------------------------------------------- Subscriptions handlers
 //----------------------------------------------------------------------------------
 
@@ -653,7 +667,156 @@ async function updateOneQApostByPatientbyId (req, res, next)  {
     }
 };
 
+//----------------------------------------------------------------- Chat handlers
+//---------------------------------------------------------------------------------
+async function getAllmessagesforPatient(req,res,next) {
+    try{
+        
+    
+    const {username, physicianUN} = req.params
 
+    let physicianFound = await physician.model.findOne({
+        where:{
+            username: physicianUN
+        }
+    })
+    if (!physicianFound) throw new Error(`this physician account doesn't exist`)
+    let subscribed = await physicianFound.getSubscriber({
+        where:{
+            username: username
+        }
+    })
+
+    if(!subscribed[0]) throw new Error(`You aren't subscribed for that physician yet`)
+    let allMessages = await messages.model.findAll({
+        where: {
+            [Op.or]: [
+                {
+                    sender: username,
+                    reciever: physicianUN
+                },
+                {
+                    sender: physicianUN,
+                    reciever: username
+                }
+            ]
+        }
+    });
+
+        if(!allMessages[0]) throw new Error(`You don't have messeges with this physician yet!`)
+
+        res.status(200).json(allMessages)
+    }catch(err){
+        next(err)
+    }
+
+    
+}
+async function postMessagesFromPatient(req,res,next) {
+    try{
+    const {username, physicianUN} = req.params
+
+    let physicianFound = await physician.model.findOne({
+        where:{
+            username: physicianUN
+        }
+    })
+    if (!physicianFound) throw new Error(`this physician account doesn't exist`)
+    let subscribed = await physicianFound.getSubscriber({
+        where:{
+            username: username
+        }
+    })
+
+    if(!subscribed[0]) throw new Error(`You aren't subscribed for that physician yet`)
+
+    let obj = {
+        message: req.body.message,
+        sender:username,
+        reciever:physicianUN
+    }
+    let createMessage = await messages.create(obj)
+
+       
+
+        res.status(201).json(createMessage)
+
+    }catch(err){
+        next(err)
+    }
+}
+async function editMessagesFromPatient(req,res,next) {
+    try{
+    const {username, physicianUN, msgID} = req.params
+
+    let physicianFound = await physician.model.findOne({
+        where:{
+            username: physicianUN
+        }
+    })
+    if (!physicianFound) throw new Error(`this physician account doesn't exist`)
+    let subscribed = await physicianFound.getSubscriber({
+        where:{
+            username: username
+        }
+    })
+
+    if(!subscribed[0]) throw new Error(`You aren't subscribed for that physician yet`)
+    let toUpdateMsg = await messages.model.findOne({
+        where:{
+            sender:username,
+            reciever:physicianUN,
+            id: msgID
+        }
+        })
+
+        if(!toUpdateMsg) throw new Error(`This msg doesn't exist anymore`)
+        let obj = {
+            message: req.body.message
+        }
+        let updated = await  toUpdateMsg.update(obj)
+
+        res.status(202).json(updated)
+
+    }catch(err){
+        next(err)
+    }
+}
+async function delMessagesFromPatient(req,res,next) {
+    try{
+    const {username, physicianUN, msgID} = req.params
+
+    let physicianFound = await physician.model.findOne({
+        where:{
+            username: physicianUN
+        }
+    })
+    if (!physicianFound) throw new Error(`this physician account doesn't exist`)
+    let subscribed = await physicianFound.getSubscriber({
+        where:{
+            username: username
+        }
+    })
+
+    if(!subscribed[0]) throw new Error(`You aren't subscribed for that physician yet`)
+    let toDeleteMsg = await messages.model.findOne({
+        where:{
+            sender:username,
+            reciever:physicianUN,
+            id: msgID
+        }
+        })
+
+        if(!toDeleteMsg) throw new Error(`This msg doesn't exist anymore`)
+        let msgGone = toDeleteMsg.message
+        let deleted  = await  toDeleteMsg.destroy()
+
+        res.status(200).json(`message with id ${msgID} , messsage: ${msgGone} has been deleted successfully`)
+
+    }catch(err){
+        next(err)
+    }
+}
 
 
 module.exports = patientRouter;

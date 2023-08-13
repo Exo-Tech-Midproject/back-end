@@ -1,8 +1,5 @@
 'use strict'
 
-const { Router } = require("express");
-const { testing } = require("../../models/index");
-
 class MethodCollection {
 
     constructor(model) {
