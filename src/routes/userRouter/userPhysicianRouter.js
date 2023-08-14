@@ -7,7 +7,11 @@ const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
 
 
 
-const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts, messages, notification} = require('../../models');
+
+
+
+const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts, messages, rating, notification} = require('../../models');
+
 const { Op } = require('sequelize');
 const e = require('express');
 
@@ -87,8 +91,13 @@ physicianRouter.delete('/physician/:username/chat/:patientUN/:msgID',bearerAuthp
 physicianRouter.put('/physician/:username/chat/:patientUN/:msgID',bearerAuthphysician, editMessagesFromphysician)
 
 
+
+// physician  Rate routes
+physicianRouter.get('/physician/:username/rating/',bearerAuthphysician, getAllRating)
+
 // Physician Notifications routes
 physicianRouter.get('/physician/:username/notifications',bearerAuthphysician, getAllNotifications)
+
 
 
 
@@ -1362,10 +1371,38 @@ async function delMessagesFromphysician(req,res,next) {
     }
 }
 
+
+//----------------------------------------------------------------- rate handlers
+//---------------------------------------------------------------------------------
+
+async function getAllRating(req,res,next) {
+    try{
+        
+    
+        const {username} = req.params
+    
+        let allRating = await rating.model.findAll({
+            where: {
+                physician: username
+            }
+        });
+        const averageRating = await rating.getAverageRating         
+        console.log(averageRating)
+          if(!allRating[0]) throw new Error(`You don't have Rating yet!`)
+    
+            res.status(200).json(allRating)
+        }catch(err){
+            next(err)
+        }
+
+    
+}
+
 //----------------------------------------------------------------- Notification  handlers
 //---------------------------------------------------------------------------------
 async function getAllNotifications(req, res, next){
     try {
+
 
     const {username} = req.params
 
