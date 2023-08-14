@@ -19,10 +19,17 @@ function handleRatingSchema(sequelize, DataTypes) {
             allowNull: false
         }
     });
-    Rating.getAverageRating = async function () {
-        const result = await this.aggregate('rating', 'AVG', { plain: false });
-        return result[0].avg;
-      };
+    Rating.calculateAverageRating = async function (physicianId) {
+        const result = await Rating.findOne({
+            attributes: [[sequelize.fn('avg', sequelize.col('rating')), 'averageRating']],
+            where: {
+                physician: physicianId
+            }
+        });
+
+        return result.dataValues.averageRating;
+    };
+
 
     return Rating;
 }
