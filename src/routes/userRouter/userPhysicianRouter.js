@@ -561,7 +561,7 @@ async function deleteGroup(req, res,next) {
         
         let deletedGroup = await group.delete(id)
 
-        res.status(204).json(`Group with name : ${groupsFound.groupName} has deleted successfully`)
+        res.status(200).json(`Group with name : ${groupsFound.groupName} has deleted successfully`)
     }catch(err){
         next(err)
     }
@@ -1199,7 +1199,7 @@ async function addComments(req, res, next) {
           if(comment){
             if(comment.author === username) {
               let deleteComment =  await Comment.delete(commentID)
-              res.status(201).json(`Message : Comment (${comment.text}) deleted successfully`);
+              res.status(200).json(`Message : Comment (${comment.text}) deleted successfully`);
             }else{
               throw new Error ('Access denied')
             }
