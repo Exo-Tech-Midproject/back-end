@@ -151,16 +151,16 @@ async function logInPageHandlerPhysician(req, res, next){
             // "department": "The department you work in"
     //     },
     //     forPatient: {
-    //         "username": "Your Username",
-    //         "fullName": "Your fullname",
-    //         "password": "Yourpassword",
-    //         "gender": "Your gender (male/female)",
-    //         "birthdate": "Your birthday as (Year-month-day)",
-    //         "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
+            // "username": "Your Username",
+            // "fullName": "Your fullname",
+            // "password": "Yourpassword",
+            // "gender": "Your gender (male/female)",
+            // "birthdate": "Your birthday as (Year-month-day)",
+            // "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
 
-    //         "maritalStatus":"Your maritalStatus as single/married" ,
-    //         "mobileNumber":"Your mobile Number" ,
-    //         "emailAddress": "Your Email"   
+            // "maritalStatus":"Your maritalStatus as single/married" ,
+            // "mobileNumber":"Your mobile Number" ,
+            // "emailAddress": "Your Email"   
     //     }
         
 

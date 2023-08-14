@@ -4,6 +4,7 @@ const express = require('express');
 const physicianRouter = express.Router();
 const basicAuthPhysician = require('../../middleware/auth/basicPhysician')
 const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
+const sequelize = require('sequelize')
 
 
 
@@ -1375,27 +1376,35 @@ async function delMessagesFromphysician(req,res,next) {
 //----------------------------------------------------------------- rate handlers
 //---------------------------------------------------------------------------------
 
-async function getAllRating(req,res,next) {
-    try{
-        
-    
-        const {username} = req.params
-    
+async function getAllRating(req, res, next) {
+    try {
+        const { username } = req.params;
+
         let allRating = await rating.model.findAll({
             where: {
                 physician: username
             }
         });
-        const averageRating = await rating.getAverageRating         
-        console.log(averageRating)
-          if(!allRating[0]) throw new Error(`You don't have Rating yet!`)
-    
-            res.status(200).json(allRating)
-        }catch(err){
-            next(err)
+
+        if (!allRating[0]) {
+            throw new Error(`You don't have any ratings yet!`);
         }
 
-    
+        // Calculate average rating
+        const averageRating = await rating.model.findOne({
+            attributes: [[sequelize.fn('avg', sequelize.col('rating')), 'averageRating']],
+            where: {
+                physician: username
+            }
+        });
+
+        res.status(200).json({
+            allRating,
+            averageRating: averageRating.dataValues.averageRating
+        });
+    } catch (err) {
+        next(err);
+    }
 }
 
 //----------------------------------------------------------------- Notification  handlers
