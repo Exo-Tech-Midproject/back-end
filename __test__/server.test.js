@@ -39,6 +39,15 @@ describe("testing the server", () => {
         expect(res.body.user.username).toEqual("Hasan1");
         expect(await bcrypt.compare("12asd31", res.body.user.password)).toEqual(true);
     });
+    it("POST to /signup/:model to create a new user. wrong info", async () => {
+        const res = await req.post("/signup/physician").send({
+            username: "Hasan1"
+            
+        });
+        
+        expect(res.status).toBe(500);
+        
+    });
     it("POST to /signup/:model to create a new user.", async () => {
         const res = await req.post("/signup/patient").send({
             username: "test2",
@@ -57,23 +66,49 @@ describe("testing the server", () => {
         expect(res.body.user.username).toEqual("test2");
         expect(await bcrypt.compare("123456", res.body.user.password)).toEqual(true);
     });
+    it("POST to /signup/:model to create a new user with wrong info.", async () => {
+        const res = await req.post("/signup/patient").send({
+            username: "test2",
+
+            
+          });
+       
+        expect(res.status).toBe(500);
+        
+    });
     it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
         const res = await req
         .post("/login/physician")
         .set("Authorization", `Basic ${await base64.encode("Hasan1:12asd31")}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        
+        expect(res.status).toBe(200); 
         expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+    });
+    it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes wrong info.", async () => {
+        const res = await req
+        .post("/login/physician")
+        .set("Authorization", `Basic ${await base64.encode("Hasan1:12asd12331")}`);
+
+        
+        expect(res.status).toBe(403); 
     });
     it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
         const res = await req
         .post("/login/patient")
         .set("Authorization", `Basic ${await base64.encode("test2:123456")}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
+        
+        expect(res.status).toBe(200); 
         expect(res.request._header.authorization).toBe("Basic dGVzdDI6MTIzNDU2");
+    });
+    it("POST to /login/:model to login as a user (use basic auth). & Need tests for auth middleware and the routes. wrong", async () => {
+        const res = await req
+        .post("/login/patient")
+        .set("Authorization", `Basic ${await base64.encode("test2:1234523236")}`);
+
+        
+        expect(res.status).toBe(403); ;
     });
 
     it("404 on a bad route", async () => {
@@ -91,18 +126,16 @@ describe("testing the server", () => {
         .get("/physician/Hasan1/profile")
         .set("Authorization", `Bearer ${token}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
-        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+        
+        expect(res.status).toBe(200); 
     });
     it("get to /physician/:username/profile to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
         const res = await req
         .get("/patient/test2/profile")
         .set("Authorization", `Bearer ${token2}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(200); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
-        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+        
+        expect(res.status).toBe(200); 
     });
     it("put to /physician/:username/profile .", async () => {
         const res = await req
@@ -120,9 +153,8 @@ describe("testing the server", () => {
         })
         .set("Authorization", `Bearer ${token}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(202); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
-        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+        
+        expect(res.status).toBe(202); 
     });
     it("put to /patient/:username/profile .", async () => {
         const res = await req
@@ -140,10 +172,388 @@ describe("testing the server", () => {
           })
         .set("Authorization", `Bearer ${token2}`);
 
-        // console.log(res.request._header.authorization); // Log the authorization header value
-        expect(res.status).toBe(202); // since Jalal is in the database, the auth middleware will work fine and send 200 status code.
-        // expect(res.request._header.authorization).toBe("Basic SGFzYW4xOjEyYXNkMzE=");
+        
+        expect(res.status).toBe(202); 
     });
+
+     // ---------------- physician subscribe ---------------
+     it("get to /physician/:username/patients/:patientUN/subscribe to login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/subscribe")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+     it("get to /physician/:username/patients/:patientUN/subscribe to login as a user (use basic auth). & Need tests for auth middleware and the routes wrong token.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/subscribe")
+        .set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(500);
+    });
+     it("subscribe but physician isn't authorized.", async () => {
+        const res = await req
+        .get("/physician/Hasan12/patients/test2/subscribe")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500);
+    });
+
+    it("get to /physician/Hasan1/patients/subscribersto login as a user (use basic auth). & Need tests for auth middleware and the routes.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/subscribers")
+        .set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200);
+    });
+
+
+    //--------------------------- Patient Vitals -------------------------
+    it("post to /patient/:username/vitals .", async () => {
+        const res = await req
+        .post("/patient/test2/vitals").send({
+            heartRate: 68
+            
+          })
+        .set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(201); 
+    })
+    it("post to /patient/:username/vitals .", async () => {
+        const res = await req
+        .post("/patient/test2/vitals").send({
+            heartRate: 2525
+            
+          })
+        .set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(500); 
+    })
+    it("post to /patient/:username/vitals .", async () => {
+        const res = await req
+        .post("/patient/test222/vitals").send({
+            heartRate: 2525
+            
+          })
+        .set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(500); 
+    })
+    it("get to /patient/:username/vitals .", async () => {
+        const res = await req
+        .get("/patient/test2/vitals").set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(200); 
+    })
+    it("get to /patient/:username/vitals/id .", async () => {
+        const res = await req
+        .get("/patient/test2/vitals/1").set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(200); 
+    })
+    it("put to /patient/:username/vitals/:id .", async () => {
+        const res = await req
+        .put("/patient/test2/vitals/1").send({
+            heartRate: 75
+            
+          })
+        .set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(202); 
+    })
+    it("delete to /patient/:username/vitals/1 .", async () => {
+        const res = await req
+        .delete("/patient/test2/vitals/1").set("Authorization", `Bearer ${token2}`);
+
+        
+        expect(res.status).toBe(200); 
+    })
+    //--------------------------- Physician Vitals -------------------------
+    
+    it("get to /physician/:username/patients/vitals .", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/vitals").set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(200); 
+    })
+
+    it("get to /physician/:username/patients/:PatientUN/vitals .", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/vitals").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200); 
+    })
+    it("get to /physician/:username/patients/:PatientUN/vitals  patient not subscribed.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test22/vitals").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    //--------------------------- Physician Appointment -------------------------
+    
+    it(" post to /physician/:username/patients/:patientUN/appointments correct info.", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test2/appointments").send({
+            date: "2027-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(201); 
+    })
+    it(" post to /physician/:username/patients/:patientUN/appointments wrong patient name.", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test23/appointments").send({
+            date: "2027-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(500); 
+    })
+    it(" post to /physician/:username/patients/:patientUN/appointments  wrong date.", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test2/appointments").send({
+            date: "2022-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(500); 
+    })
+
+    it("get to /physician/:username/patients/:patientUN/appointments  correct info.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/appointments").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200); 
+    })
+    it("get to /physician/:username/patients/:patientUN/appointments wrong patient name.", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test22/appointments").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("put to /physician/:username/patients/:patientUN/appointments correct info.", async () => {
+        const res = await req
+        .put("/physician/Hasan1/patients/test2/appointments/1").send({
+            date: "2025-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(202); 
+    })
+    it("put to /physician/:username/patients/:patientUN/appointments wroing patient info.", async () => {
+        const res = await req
+        .put("/physician/Hasan1/patients/test222/appointments/1").send({
+            date: "2025-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("put to /physician/:username/patients/:patientUN/appointments wrong appointment info.", async () => {
+        const res = await req
+        .put("/physician/Hasan1/patients/test2/appointments/99").send({
+            date: "2025-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("delete to /physician/:username/patients/:patientUN/appointments wrong appointment info.", async () => {
+        const res = await req
+        .delete("/physician/Hasan1/patients/test2/appointments/99").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("delete to /physician/:username/patients/:patientUN/appointments correct appointment info.", async () => {
+        const res = await req
+        .delete("/physician/Hasan1/patients/test2/appointments/1").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200); 
+    })
+    
+    //--------------------------- Patient Appointment -------------------------
+    it("get to /patient/:username/appointments  no appointments info.", async () => {
+        const res = await req
+        .get("/patient/test2/appointments").set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("get to /patient/:username/physicians/:physicianUN/appointments  no appointments info.", async () => {
+        const res = await req
+        .get("/patient/test2/physicians/Hasan1/appointments").set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("get to /patient/test2/appointments/99  no appointments info.", async () => {
+        const res = await req
+        .get("/patient/test2/appointments/99").set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it(" post to /physician/:username/patients/:patientUN/appointments correct info.", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test2/appointments").send({
+            date: "2027-08-12"
+        }).set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(201); 
+    })
+    it("get to /patient/:username/appointments  with appointment.", async () => {
+        const res = await req
+        .get("/patient/test2/appointments").set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(200); 
+    })
+    it("get to /patient/:username/physicians/:physicianUN/appointments  correct appointments info.", async () => {
+        const res = await req
+        .get("/patient/test2/physicians/Hasan1/appointments").set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(200); 
+    })
+    it("get to /patient/test2/appointments/2  found appointments info.", async () => {
+        const res = await req
+        .get("/patient/test2/appointments/2").set("Authorization", `Bearer ${token2}`);
+
+        expect(res.status).toBe(200); 
+    })
+
+    //--------------------------- Physician Prescriptions -------------------------
+    it(" get to /physician/:username/patients/prescriptions no Data", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/prescriptions").set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(500); 
+    })
+    it(" get to /physician/:username/patients/:patientUN/prescriptions' no Data", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/prescriptions").set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(500); 
+    })
+    it(" get to /physician/:username/patients/:patientUN/prescriptions' wrongPatient Data", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test22/prescriptions").set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(500); 
+    })
+    it("put to /physician/:username/patients/:patientUN/prescriptions/:id no info.", async () => {
+        const res = await req
+        .put("/physician/Hasan1/patients/test2/prescriptions/99").send({
+            
+            dateOfIssue: "2023-01-12",
+              patientName: "Ahmad",
+              diagnosis: "Cold Flu",
+              medicines: [{"drugname":"Metformin"},{"drugname":"Amaryl","dosage": "one tablet after the meal "}],
+              physicianName: "Khalil" ,
+              signature:"123123",
+              username:"test12"
+
+      }).set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("put to /physician/:username/patients/:patientUN/prescriptions/:id no info.", async () => {
+        const res = await req
+        .put("/physician/Hasan1/patients/test222/prescriptions/99").send({
+
+            dateOfIssue: "2023-01-12",
+              patientName: "Ahmad",
+              diagnosis: "Cold Flu",
+              medicines: [{"drugname":"Metformin"},{"drugname":"Amaryl","dosage": "one tablet after the meal "}],
+              physicianName: "Khalil" ,
+              signature:"123123",
+              username:"test12"
+
+      }).set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("delete to /physician/:username/patients/:patientUN/prescriptions/:id no info.", async () => {
+        const res = await req
+        .delete("/physician/Hasan1/patients/test2/prescriptions/99").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+    it("delete to /physician/:username/patients/:patientUN/prescriptions/:id no info.", async () => {
+        const res = await req
+        .delete("/physician/Hasan1/patients/test222/prescriptions/99").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(500); 
+    })
+
+
+    it(" post to /physician/:username/patients/:patientUN/appointments correct info .", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test2/prescriptions").send({
+
+            dateOfIssue: "2023-01-12",
+              patientName: "Ahmad",
+              diagnosis: "Cold Flu",
+              medicines: [{"drugname":"Metformin"},{"drugname":"Amaryl","dosage": "one tablet after the meal "}],
+              physicianName: "Khalil" ,
+              signature:"123123",
+              username:"test12"
+
+      }).set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(201); 
+    })
+    it(" post to /physician/:username/patients/:patientUN/appointments wrong info .", async () => {
+        const res = await req
+        .post("/physician/Hasan1/patients/test22/prescriptions").send({
+
+            dateOfIssue: "2023-01-12",
+              patientName: "Ahmad",
+              diagnosis: "Cold Flu",
+              medicines: [{"drugname":"Metformin"},{"drugname":"Amaryl","dosage": "one tablet after the meal "}],
+              physicianName: "Khalil" ,
+              signature:"123123",
+              username:"test12"
+
+      }).set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(500); 
+    })
+    
+
+    it(" get to /physician/:username/patients/prescriptions no Data", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/prescriptions").set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(200); 
+    })
+    it(" get to /physician/:username/patients/:patientUN/prescriptions' no Data", async () => {
+        const res = await req
+        .get("/physician/Hasan1/patients/test2/prescriptions").set("Authorization", `Bearer ${token}`);
+        
+        expect(res.status).toBe(200); 
+    })
+
+    it("put to /physician/:username/patients/:patientUN/prescriptions/:id no info.", async () => {
+        const res = await req
+        .put("/physician/Hasan1/patients/test2/prescriptions/1").send({
+            
+            dateOfIssue: "2023-01-12",
+              patientName: "Ahmad",
+              diagnosis: "Cold Fluuu",
+              medicines: [{"drugname":"Metformin"},{"drugname":"Amaryl","dosage": "one tablet after the meal "}],
+              physicianName: "Khalil" ,
+              signature:"123123",
+              username:"test12"
+
+      }).set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(202); 
+    })
+   
+    it("delete to /physician/:username/patients/:patientUN/prescriptions/:id no info.", async () => {
+        const res = await req
+        .delete("/physician/Hasan1/patients/test2/prescriptions/1").set("Authorization", `Bearer ${token}`);
+
+        expect(res.status).toBe(200); 
+    })
+    
+ //--------------------------- Patient Prescriptions -------------------------
 });
 
 describe("MethodCollection", () => {

@@ -28,6 +28,7 @@ io.on('connection', (socket) => {
           }
         socket.broadcast.to(payload.roomName).emit('chat message',obj)
         socket.on('chat message', (msg) => {
+            
             io.to(payload.roomName).emit('chat message', msg);
         })
         

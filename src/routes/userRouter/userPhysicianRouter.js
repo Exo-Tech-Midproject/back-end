@@ -349,7 +349,7 @@ try {
                 appointmentData.physicianUsername = username;
                 appointmentData.patientUsername = patientUN;
                 appointments.update(req.body)
-                return res.status(200).json(appointments);
+                return res.status(202).json(appointments);
             } else throw new Error(`Appointment doesn't exist`)
 
         } else throw new Error(`This patient didn't subscribe for you`)
@@ -942,7 +942,7 @@ async function handleAllUserPrescriptions(req, res ,next) {
                 }
             })
 
-            if(allPrescriptions) {
+            if(allPrescriptions[0]) {
                 
                 res.status(200).json(allPrescriptions);
             } else throw new Error(`You don't have any prescriptions yet`)
@@ -1085,7 +1085,7 @@ async function deleteOnePatientPrescriptionsByID(req, res ,next) {
                 }})
                 if(existedRecord) {
                     let records = await prescription.delete(id);
-                    res.status(202).json(`Prescription of id: - ${id} - is deleted successfully`);
+                    res.status(200).json(`Prescription of id: - ${id} - is deleted successfully`);
                 } else throw new Error(`This patient doesn't have a current record, please create one first`)
             } else throw new Error(`This patient didn't subscribe for you`)
         } else throw new Error(`Physician isn't found`)

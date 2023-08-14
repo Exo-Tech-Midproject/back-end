@@ -410,7 +410,7 @@ async function addVitals (req,res,next){
             })
         }
 
-
+        
 
 //----------------------------------------------
         res.status(201).json(addedVitals)
@@ -453,7 +453,7 @@ async function updateVitals (req,res,next){
         
         req.body.patientUN = username
         let updateVital = await vital.update(id, req.body)
-        res.status(200).json(updateVital)
+        res.status(202).json(updateVital)
     } catch (err) {
         next(err)
     }
