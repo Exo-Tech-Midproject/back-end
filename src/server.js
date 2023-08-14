@@ -28,6 +28,7 @@ io.on('connection', (socket) => {
           }
         socket.broadcast.to(payload.roomName).emit('chat message',obj)
         socket.on('chat message', (msg) => {
+            
             io.to(payload.roomName).emit('chat message', msg);
         })
         
@@ -47,6 +48,12 @@ io.on('connection', (socket) => {
     })
 })
 
+
+let vitalsNotification = io.of('/notifications')
+
+vitalsNotification.on('connection', (socket) => {
+socket.on('problem')
+})
 
 //-------------------
 

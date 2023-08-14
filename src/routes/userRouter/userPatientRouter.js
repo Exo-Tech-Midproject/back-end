@@ -7,7 +7,7 @@ const bearerAuthPatient = require('../../middleware/auth/bearerPatient')
 
 
 
-const { group , physician , patient, appointment, vital , disease , prescription ,QuestionAnswer ,Comment, groupPosts, messages} = require('../../models');
+const { group , physician , patient, appointment, vital , disease , prescription ,QuestionAnswer ,Comment, groupPosts, messages, notification} = require('../../models');
 const { Op } = require('sequelize');
 
 
@@ -76,7 +76,8 @@ patientRouter.put('/patient/:username/chat/:physicianUN/:msgID',bearerAuthPatien
 
 
 
-
+// Patient Notifications routes
+// patientRouter.post('/patient/:username/notifications',bearerAuthPatient, sendNotificationPatient)
 
 
 
@@ -193,7 +194,7 @@ async function  patientProfileUpdateHandlder (req, res, next){
         if (!updateProfile) {
             return res.status(404).json({ error: 'Access denied' });
         } else {
-            res.status(200).json(updateProfile);
+            res.status(202).json(updateProfile);
         }
     }catch(err){
         next(err)
@@ -378,6 +379,40 @@ async function addVitals (req,res,next){
         
         req.body.patientUN = username
         let addedVitals = await vital.create(req.body)
+
+//---------------------------------------------- new work
+        let notificationCaptured = `Patient ${username} Abnormal Vitals: `;
+        if (addedVitals.heartRate > 120 || addedVitals.heartRate < 60) {
+            notificationCaptured += `Heart Rate: ${addedVitals.heartRate}`;
+        }
+        if (addedVitals.oxygenSat < 90) {
+            notificationCaptured += ` - Oxygen Saturation: ${addedVitals.oxygenSat}`;
+        }
+        if (addedVitals.bloodGlucose > 100 || addedVitals.heartRate < 70) {
+            notificationCaptured += ` - Blood Glucose: ${addedVitals.bloodGlucose}`;
+        }
+        if (addedVitals.temperature > 37.1 || addedVitals.heartRate < 36) {
+            notificationCaptured += ` - Temperature: ${addedVitals.temperature}`;
+        }
+        if (addedVitals.systolicBP > 130 || addedVitals.heartRate < 90) {
+            notificationCaptured += ` - Systolic BP: ${addedVitals.systolicBP}`;
+        }
+        if (addedVitals.diastolicBP > 90 || addedVitals.heartRate < 60) {
+            notificationCaptured += ` - Diastolic BP: ${addedVitals.diastolicBP}`;
+        }
+
+        console.log(notificationCaptured)
+
+        if(notificationCaptured.length > 5) {
+            let toCreateNotification = await notification.create({
+                event:notificationCaptured,
+                patientUN:username
+            })
+        }
+
+        
+
+//----------------------------------------------
         res.status(201).json(addedVitals)
     } catch (err) {
         next(err)
@@ -418,7 +453,7 @@ async function updateVitals (req,res,next){
         
         req.body.patientUN = username
         let updateVital = await vital.update(id, req.body)
-        res.status(200).json(updateVital)
+        res.status(202).json(updateVital)
     } catch (err) {
         next(err)
     }
@@ -817,6 +852,10 @@ async function delMessagesFromPatient(req,res,next) {
         next(err)
     }
 }
+
+//----------------------------------------------------------------- Notification  handlers
+//---------------------------------------------------------------------------------
+
 
 
 module.exports = patientRouter;

@@ -197,6 +197,33 @@ class MethodCollection {
   
   }
 
+  // async function getAllNotifications(patientUN,username){
+  //   let currentPhysician = await findOne({
+  //     where:{
+  //       username:username
+  //     }
+  //   })
+
+  //   let subscribers = await currentPhysician.getSubscriber()
+  //   let arr = []
+  //     subscribers.forEach(subscriber => {
+  //         let subNotifications = await notifications.findAll({
+            
+  //           where:{
+  //             patientUN:subscriber.username
+  //           }
+            
+  //         })
+  //         let obj = {
+  //           username:subscriber.username,
+  //           notifications:subNotifications
+  //         }
+  //         arr.push(obj)
+  //     })
+
+
+  // }
+
   
 
 module.exports = MethodCollection;
