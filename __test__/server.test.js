@@ -77,7 +77,6 @@ describe("testing the server", () => {
         expect(await bcrypt.compare("123456", res.body.user.password)).toEqual(true);
     });
 
-
      // ---------------- login ---------------
 
     it("POST to /signup/:model to create a new user with wrong info.", async () => {
@@ -662,6 +661,80 @@ it("get to /patient/:username/groups/:groupName", async () => {
     expect(res.status).toBe(200);
 });
 
+
+ // ---------------- physician groups posts ---------------
+
+ it("post to /physician/:username/groups/:id/posts", async () => {
+    const res = await req
+    .post("/physician/Hasan1/groups/1/posts").send({
+        title:"hello",
+        author: "Hasan1",
+        textContent: "hello from the other world"
+        })
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(201);
+});
+
+it("get to /physician/:username/groups/:id/posts", async () => {
+    const res = await req
+    .get("/physician/Hasan1/groups/1/posts")
+    .set("Authorization", `Bearer ${token}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("get to /physician/:username/groups/:id/posts/:postID", async () => {
+    const res = await req
+    .get("/physician/Hasan1/groups/1/posts/1")
+    .set("Authorization", `Bearer ${token}`);
+    
+    expect(res.status).toBe(200);
+});
+
+ // ---------------- patient groups posts ---------------
+
+ it("get to /patient/:username/groups/:id/posts", async () => {
+    const res = await req
+    .get("/patient/test2/groups/1/posts")
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("get to /patient/:username/groups/:id/posts/:postID", async () => {
+    const res = await req
+    .get("/patient/test2/groups/1/posts/1")
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(200);
+});
+
+ // ---------------- update physician groups posts ---------------
+
+it("put to /physician/:username/groups/:id/posts/:postID", async () => {
+    const res = await req
+    .put("/physician/Hasan1/groups/1/posts/1").send({
+        title:"hello from update test",
+        author: "Hasan1",
+        textContent: "hello from the other world"
+        })
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(202);
+});
+ // ---------------- Delete Groups posts ---------------
+
+ it("delete to /physician/:username/groups/:id", async () => {
+    const res = await req
+    .delete("/physician/Hasan1/groups/1/posts/1")
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+});
+
+
+
  // ---------------- Delete Groups ---------------
 
 it("delete to /physician/:username/groups/:id", async () => {
@@ -669,7 +742,198 @@ it("delete to /physician/:username/groups/:id", async () => {
     .delete("/physician/Hasan1/groups/1")
     .set("Authorization", `Bearer ${token}`);
 
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(200);
+});
+
+
+// ---------------- patient Q&A routes ---------------
+
+it("post to /patient/:username/Q&A", async () => {
+    const res = await req
+    .post("/patient/test2/Q&A").send({
+        craetedBy:"test2",
+        title: "first Q&A",
+        description:"hello from the other side"
+    })
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(201);
+});
+
+it("get to /patient/:username/Q&A", async () => {
+    const res = await req
+    .get("/patient/test2/Q&A")
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("get to /patient/:username/Q&A/:id", async () => {
+    const res = await req
+    .get("/patient/test2/Q&A/1")
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(200);
+});
+
+
+it("put to /patient/:username/Q&A/:id", async () => {
+    const res = await req
+    .put("/patient/test2/Q&A/1").send({
+        craetedBy:"test2",
+        title: "first Q&A",
+        description:"hello from update"
+    })
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(202);
+});
+
+// ----------------physician Q&A routes ---------------
+
+ it("post to /physician/:username/Q&A/:id/comments", async () => {
+    const res = await req
+    .post("/physician/Hasan1/Q&A/1/comments").send({
+        text:"Hi",
+        })
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(201);
+});
+
+it("get to /physician/:username/Q&A/:id/comments", async () => {
+    const res = await req
+    .get("/physician/Hasan1/Q&A/1/comments")
+    .set("Authorization", `Bearer ${token}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("get to /physician/:username/Q&A", async () => {
+    const res = await req
+    .get("/physician/Hasan1/Q&A")
+    .set("Authorization", `Bearer ${token}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("put to /physician/:username/Q&A/:id/comments/:commentID", async () => {
+    const res = await req
+    .put("/physician/Hasan1/Q&A/1/comments/1").send({
+        text:"Hello",
+        })
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(202);
+});
+
+// ---------------- Delete physician Q&A ---------------
+
+it("delete to /physician/:username/Q&A/:id/comments/:commentID", async () => {
+   const res = await req
+   .delete("/physician/Hasan1/Q&A/1/comments/1")
+   .set("Authorization", `Bearer ${token}`);
+
+   expect(res.status).toBe(200);
+});
+
+ // ---------------- Delete patient Q&A ---------------
+
+it("delete to /patient/:username/Q&A/:id", async () => {
+    const res = await req
+    .delete("/patient/test2/Q&A/1")
+    .set("Authorization", `Bearer ${token2}`);
+
+    expect(res.status).toBe(200);
+});
+
+
+ // ---------------- physician Chat routes ---------------
+
+ it("post to /physician/:username/chat/:patientUN", async () => {
+    const res = await req
+    .post("/physician/Hasan1/chat/test2").send({
+        message:"Hi",
+        sender: "Hasan1",
+        reciever:"test2"
+        })
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(201);
+});
+
+it("get to /physician/:username/chat/:patientUN", async () => {
+    const res = await req
+    .get("/physician/Hasan1/chat/test2")
+    .set("Authorization", `Bearer ${token}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("put to /physician/:username/chat/:patientUN/:msgID", async () => {
+    const res = await req
+    .put("/physician/Hasan1/chat/test2/1").send({
+        message:"Hello there",
+        sender: "Hasan1",
+        reciever:"test2"
+        })
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(202);
+});
+
+ // ---------------- patient Chat routes ---------------
+
+ it("post to /patient/:username/chat/:physicianUN", async () => {
+    const res = await req
+    .post("/patient/test2/chat/Hasan1").send({
+        message:"Hi",
+        sender: "test2",
+        reciever:"Hasan1"
+        })
+    .set("Authorization", `Bearer ${token2}`);
+
+    expect(res.status).toBe(201);
+});
+
+it("get to /patient/:username/chat/:physicianUN", async () => {
+    const res = await req
+    .get("/patient/test2/chat/Hasan1")
+    .set("Authorization", `Bearer ${token2}`);
+    
+    expect(res.status).toBe(200);
+});
+
+it("put to /patient/:username/chat/:physicianUN/:msgID", async () => {
+    const res = await req
+    .put("/patient/test2/chat/Hasan1/2").send({
+        message:"Hi doctor",
+        sender: "test2",
+        reciever:"Hasan1"
+        })
+    .set("Authorization", `Bearer ${token2}`);
+
+    expect(res.status).toBe(202);
+});
+
+ // ---------------- Delete patient Chat ---------------
+
+it("delete to /patient/:username/chat/:physicianUN/:msgID", async () => {
+    const res = await req
+    .delete("/patient/test2/chat/Hasan1/2")
+    .set("Authorization", `Bearer ${token2}`);
+
+    expect(res.status).toBe(200);
+});
+
+ // ---------------- Delete physician Chat ---------------
+
+it("delete to /physician/:username/chat/:patientUN/:msgID", async () => {
+    const res = await req
+    .delete("/physician/Hasan1/chat/test2/1")
+    .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
 });
 
 });
