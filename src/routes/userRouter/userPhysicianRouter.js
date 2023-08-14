@@ -391,7 +391,7 @@ try {
                 let dateTosendBack = appointments.date;
                 console.log(dateTosendBack)
                  appointment.delete(id)
-                return res.status(204).json(`Appointment with id ${id} and date of ${dateTosendBack} has been deleted`);
+                return res.status(200).json(`Appointment with id ${id} and date of ${dateTosendBack} has been deleted`);
             } else throw new Error(`Appointment doesn't exist`)
 
         } else throw new Error(`This patient didn't subscribe for you`)
