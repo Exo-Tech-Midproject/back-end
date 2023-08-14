@@ -7,7 +7,11 @@ const bearerAuthPatient = require('../../middleware/auth/bearerPatient')
 
 
 
-const { group , physician , patient, appointment, vital , disease , prescription ,QuestionAnswer ,Comment, groupPosts, messages} = require('../../models');
+
+
+
+const { group , physician , patient, appointment, vital , disease , prescription ,QuestionAnswer ,Comment, groupPosts, messages, rating, notification} = require('../../models');
+
 const { Op } = require('sequelize');
 
 
@@ -76,6 +80,15 @@ patientRouter.put('/patient/:username/chat/:physicianUN/:msgID',bearerAuthPatien
 
 
 
+
+
+patientRouter.get('/patient/:username/rating/',bearerAuthPatient, getAllCreatedRating)
+patientRouter.post('/patient/:username/rating/:physicianUN',bearerAuthPatient, postRateFromPatient)
+patientRouter.delete('/patient/:username/rating/:id',bearerAuthPatient, delRateFromPatient)
+patientRouter.put('/patient/:username/rating/:id',bearerAuthPatient, editRateFromPatient)
+
+// Patient Notifications routes
+// patientRouter.post('/patient/:username/notifications',bearerAuthPatient, sendNotificationPatient)
 
 
 
@@ -378,6 +391,40 @@ async function addVitals (req,res,next){
         
         req.body.patientUN = username
         let addedVitals = await vital.create(req.body)
+
+//---------------------------------------------- new work
+        let notificationCaptured = `Patient ${username} Abnormal Vitals: `;
+        if (addedVitals.heartRate > 120 || addedVitals.heartRate < 60) {
+            notificationCaptured += `Heart Rate: ${addedVitals.heartRate}`;
+        }
+        if (addedVitals.oxygenSat < 90) {
+            notificationCaptured += ` - Oxygen Saturation: ${addedVitals.oxygenSat}`;
+        }
+        if (addedVitals.bloodGlucose > 100 || addedVitals.heartRate < 70) {
+            notificationCaptured += ` - Blood Glucose: ${addedVitals.bloodGlucose}`;
+        }
+        if (addedVitals.temperature > 37.1 || addedVitals.heartRate < 36) {
+            notificationCaptured += ` - Temperature: ${addedVitals.temperature}`;
+        }
+        if (addedVitals.systolicBP > 130 || addedVitals.heartRate < 90) {
+            notificationCaptured += ` - Systolic BP: ${addedVitals.systolicBP}`;
+        }
+        if (addedVitals.diastolicBP > 90 || addedVitals.heartRate < 60) {
+            notificationCaptured += ` - Diastolic BP: ${addedVitals.diastolicBP}`;
+        }
+
+        console.log(notificationCaptured)
+
+        if(notificationCaptured.length > 5) {
+            let toCreateNotification = await notification.create({
+                event:notificationCaptured,
+                patientUN:username
+            })
+        }
+
+        
+
+//----------------------------------------------
         res.status(201).json(addedVitals)
     } catch (err) {
         next(err)
@@ -418,7 +465,7 @@ async function updateVitals (req,res,next){
         
         req.body.patientUN = username
         let updateVital = await vital.update(id, req.body)
-        res.status(200).json(updateVital)
+        res.status(202).json(updateVital)
     } catch (err) {
         next(err)
     }
@@ -817,6 +864,115 @@ async function delMessagesFromPatient(req,res,next) {
         next(err)
     }
 }
+
+
+//----------------------------------------------------------------- Rate handlers
+//---------------------------------------------------------------------------------
+
+async function getAllCreatedRating(req,res,next) {
+    try{
+        
+    
+    const {username} = req.params
+
+    let allRating = await rating.model.findAll({
+        where: {
+            patient: username
+        }
+    });
+
+        if(!allRating[0]) throw new Error(`You don't have Rating yet!`)
+
+        res.status(200).json(allRating)
+    }catch(err){
+        next(err)
+    }
+
+    
+}
+async function postRateFromPatient(req,res,next) {
+    try{
+    const {username, physicianUN} = req.params
+
+    let physicianFound = await physician.model.findOne({
+        where:{
+            username: physicianUN
+        }
+    })
+    if (!physicianFound) throw new Error(`this physician account doesn't exist`)
+
+    let subscribed = await physicianFound.getSubscriber({
+        where:{
+            username: username
+        }
+    })
+
+    if(!subscribed[0]) throw new Error(`You aren't subscribed for that physician yet`)
+    
+    let obj = {
+        rating: req.body.rating,
+        patient:username,
+        physician:physicianUN
+    }
+    let createRating = await rating.create(obj)
+
+        res.status(201).json(createRating)
+
+    }catch(err){
+        next(err)
+    }
+}
+async function editRateFromPatient(req,res,next) {
+    try{
+    const {username, id} = req.params
+
+
+    let toUpdaterate = await rating.model.findOne({
+        where:{
+            patient:username,
+            id: id
+        }
+        })
+
+        if(!toUpdaterate) throw new Error(`This rate doesn't exist anymore`)
+        let obj = {
+            rating: req.body.rating
+        }
+        let updated = await  toUpdaterate.update(obj)
+
+        res.status(202).json(updated)
+
+    }catch(err){
+        next(err)
+    }
+}
+async function delRateFromPatient(req,res,next) {
+    try{
+    const {username,id } = req.params
+
+    
+    let toDeleterate = await rating.model.findOne({
+        where:{
+            patient:username,
+            id: id
+        }
+        })
+
+        if(!toDeleterate) throw new Error(`This rate doesn't exist anymore`)
+        let rateGone = toDeleterate.rating
+        let deleted  = await  toDeleterate.destroy()
+
+        res.status(200).json(`Rate with id ${id} , Rate: ${rateGone} has been deleted successfully`)
+
+    }catch(err){
+        next(err)
+    }
+}
+
+//----------------------------------------------------------------- Notification  handlers
+//---------------------------------------------------------------------------------
+
+
 
 
 module.exports = patientRouter;

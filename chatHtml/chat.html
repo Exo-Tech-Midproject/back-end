@@ -129,9 +129,10 @@
          </div>
        </div>
      </div>
-   </div>
+   </div> 
    <script src="/socket.io/socket.io.js"></script>
    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js" integrity="sha512-42PE0rd+wZ2hNXftlM78BSehIGzezNeQuzihiBCvUEB3CVxHvsShF86wBWwQORNxNINlBPuq7rG4WWhNiTVHFg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
    
     <script>
       'use strict'
@@ -139,6 +140,7 @@
 
         const username = window.location.pathname.split('/')[2]
         const toChatWith = window.location.pathname.split('/')[5]
+        const accounTtype = window.location.pathname.split('/')[1]
         let roomName = `${username}` + `${toChatWith}`
         roomName = roomName.split('').sort().join('')
 
@@ -150,6 +152,22 @@
 
         socket.emit('enter chat', userData)
         console.log(username,toChatWith,roomName)
+
+            getAllmesssagesFromDb(accounTtype).then(messagesData => {
+              messagesData.forEach(message => {
+                const localTime = convertToLocalAmmanTime(message.createdAt);
+                const item = document.createElement('li');
+                item.className = message.sender === username ? 'receiver' : '';
+                item.innerHTML = `
+                  <div class="message-content">
+                    <p class="meta"><span id="sendername">${message.sender}</span></p>
+                    <p class="text">${message.message}</p>
+                  </div>
+                  <span class="timespan">${localTime}</span>`;
+                messages.appendChild(item);
+              });
+              messages.scrollTop = messages.scrollHeight;
+            });
 
         let form = document.getElementById('form')
         let input = document.getElementById('input')
@@ -165,6 +183,10 @@
               name: username,
               time: moment().format('h:mm a')
             }
+            console.log(input.value)
+            addMessagesToDb(accounTtype, input.value ,username,toChatWith)
+            
+
             socket.emit('chat message', obj)
             input.value = ''
           }
@@ -186,6 +208,49 @@
         socket.on('disconnect', () => {
           socket.emit('left-chat', 'hellow')
         })
+
+
+
+
+         async function addMessagesToDb(accountType,msg,sender, receiver){
+          if (accountType === 'patient' ) {
+           let sentmsg = await axios.post(`/patient/${username}/chat/${toChatWith}`,{
+            message: msg,
+            reciever:sender,
+            sender:receiver,
+            createdAt: moment().format('h:mm a')
+          })
+          console.log(sentmsg)
+          }
+          if (accountType === 'physician' ) {
+            let sentmsg = await axios.post(`/physician/${username}/chat/${toChatWith}`,{
+            message: msg,
+            reciever:sender,
+            sender:receiver
+          })
+          console.log(sentmsg)
+          }
+
+          return
+        }
+
+        async function getAllmesssagesFromDb(accountType){
+          let allData = []
+          if (accountType === 'patient' ) {
+            allData = await axios.get(`/patient/${username}/chat/${toChatWith}`)
+          }
+          if (accountType === 'physician' ) {
+            allData = await axios.get(`/physician/${username}/chat/${toChatWith}`)
+          }
+            console.log(allData.data)
+            console.log(allData)
+            return allData.data
+        }
+            function convertToLocalAmmanTime(utcTimestamp) {
+                const utcDate = new Date(utcTimestamp);
+                const options = { timeZone: 'Asia/Amman', hour12: true, hour: 'numeric', minute: 'numeric' };
+                return utcDate.toLocaleString('en-US', options);
+          }
       </script>
  </body>
 </html>

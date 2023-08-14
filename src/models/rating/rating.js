@@ -1,11 +1,14 @@
 'use strict';
 
 function handleRatingSchema(sequelize, DataTypes) {
-    let rating = sequelize.define('rating', {
+    let Rating = sequelize.define('rating', {
         rating: {
-            type: DataTypes.STRING,
+            type: DataTypes.FLOAT,  // Change data type to INTEGER for rating
             allowNull: false,
-            unique: true
+            validate: {
+                min: 1,
+                max: 5
+            }
         },
         physician: {
             type: DataTypes.STRING,
@@ -14,14 +17,14 @@ function handleRatingSchema(sequelize, DataTypes) {
         patient: {
             type: DataTypes.STRING,
             allowNull: false
-        },
-        date: {
-            type: DataTypes.DATEONLY,
-            allowNull: false
         }
+    });
+    Rating.getAverageRating = async function () {
+        const result = await this.aggregate('rating', 'AVG', { plain: false });
+        return result[0].avg;
+      };
 
-    })
-    return rating;
+    return Rating;
 }
 
 module.exports = handleRatingSchema;
