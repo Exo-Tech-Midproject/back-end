@@ -25,6 +25,7 @@ const diseaseModel = require('../models/diseaseControl/diseaseControl')
 const prescriptionModel = require('../models/prescriptions/prescriptions')
 const vitalsModel = require('../models/vitalSigns/vitalSigns')
 const chatModel = require('../models/chatMessages/chatMessages')
+const notificationsModel = require('../models/notifications/notifications')
 
 
 
@@ -45,6 +46,7 @@ let prescriptions = prescriptionModel(sequelize, DataTypes);
 let vitals = vitalsModel(sequelize, DataTypes);
 let rating = ratingModel(sequelize, DataTypes);
 let messages = chatModel(sequelize, DataTypes)
+let notifications = notificationsModel(sequelize, DataTypes)
 
 
 
@@ -159,7 +161,8 @@ module.exports = {
     Comment: new Collection(comments),
     groupPosts: new Collection(groupPosts),
     rating: new Collection(rating),
-    messages: new Collection(messages)
+    messages: new Collection(messages),
+    notification: new Collection(notifications)
 
 };
 

@@ -7,8 +7,13 @@ const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
 
 
 
-const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts,rating, messages} = require('../../models');
+
+
+
+const { group , physician , patient, appointment, vital, disease, prescription ,QuestionAnswer ,Comment, groupPosts, messages, rating, notification} = require('../../models');
+
 const { Op } = require('sequelize');
+const e = require('express');
 
 
 
@@ -86,8 +91,14 @@ physicianRouter.delete('/physician/:username/chat/:patientUN/:msgID',bearerAuthp
 physicianRouter.put('/physician/:username/chat/:patientUN/:msgID',bearerAuthphysician, editMessagesFromphysician)
 
 
+
 // physician  Rate routes
 physicianRouter.get('/physician/:username/rating/',bearerAuthphysician, getAllRating)
+
+// Physician Notifications routes
+physicianRouter.get('/physician/:username/notifications',bearerAuthphysician, getAllNotifications)
+
+
 
 
 
@@ -228,7 +239,7 @@ async function physicianProfileUpdateHandlder(req, res, next) {
         if (!updateProfile) {
             return res.status(404).json({ error: 'Access denied' });
         } else {
-            res.status(200).json(updateProfile);
+            res.status(202).json(updateProfile);
         }
     } catch (err) {
         next(err)
@@ -347,7 +358,7 @@ try {
                 appointmentData.physicianUsername = username;
                 appointmentData.patientUsername = patientUN;
                 appointments.update(req.body)
-                return res.status(200).json(appointments);
+                return res.status(202).json(appointments);
             } else throw new Error(`Appointment doesn't exist`)
 
         } else throw new Error(`This patient didn't subscribe for you`)
@@ -940,7 +951,7 @@ async function handleAllUserPrescriptions(req, res ,next) {
                 }
             })
 
-            if(allPrescriptions) {
+            if(allPrescriptions[0]) {
                 
                 res.status(200).json(allPrescriptions);
             } else throw new Error(`You don't have any prescriptions yet`)
@@ -1083,7 +1094,7 @@ async function deleteOnePatientPrescriptionsByID(req, res ,next) {
                 }})
                 if(existedRecord) {
                     let records = await prescription.delete(id);
-                    res.status(202).json(`Prescription of id: - ${id} - is deleted successfully`);
+                    res.status(200).json(`Prescription of id: - ${id} - is deleted successfully`);
                 } else throw new Error(`This patient doesn't have a current record, please create one first`)
             } else throw new Error(`This patient didn't subscribe for you`)
         } else throw new Error(`Physician isn't found`)
@@ -1360,6 +1371,7 @@ async function delMessagesFromphysician(req,res,next) {
     }
 }
 
+
 //----------------------------------------------------------------- rate handlers
 //---------------------------------------------------------------------------------
 
@@ -1386,7 +1398,49 @@ async function getAllRating(req,res,next) {
     
 }
 
+//----------------------------------------------------------------- Notification  handlers
+//---------------------------------------------------------------------------------
+async function getAllNotifications(req, res, next){
+    try {
 
+
+    const {username} = req.params
+
+    let currentPhysician = await physician.model.findOne({
+      where:{
+        username:username
+      }
+    })
+
+    let subscribers = await currentPhysician.getSubscriber()
+
+    // console.log(subscribers[0])
+    let finalArr = [];
+    let arr = await Promise.all(subscribers.map(async subscriber => {
+        let subNotifications = await notification.model.findAll({
+            where: {
+                patientUN: subscriber.username
+            }
+        })
+        // let obj = {
+        //     username: subscriber.username,
+        //     notifications: subNotifications
+        // }
+        return subNotifications;
+    }));
+    let arr2 = arr.forEach(element => {
+        finalArr.push(...element)
+    })
+    
+    
+   
+    //   console.log(arr)
+      res.status(200).json(finalArr)
+
+    }catch(err){
+        next(err)
+    }
+  }
 
 module.exports = physicianRouter;
 
