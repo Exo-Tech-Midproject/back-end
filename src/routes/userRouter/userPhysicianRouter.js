@@ -217,11 +217,13 @@ async function physicianProfileGetHandlder(req, res, next) {
             return res.status(404).json({ error: 'User not found' });
         } else {
             let result = {
-                username: userProfile.username,
-                fullName: userProfile.fullName,
-                gender: userProfile.gender,
-                birthdate: userProfile.birthdate,
-                department: userProfile.department,
+
+                username:userProfile.username,
+                fullName:userProfile.fullName,
+                gender:userProfile.gender,
+                birthdate:userProfile.birthDate,
+                department:userProfile.department,
+
             }
             res.status(200).json(result);
         }

@@ -81,7 +81,7 @@ patientRouter.put('/patient/:username/chat/:physicianUN/:msgID',bearerAuthPatien
 
 
 
-
+// Rating Routes
 patientRouter.get('/patient/:username/rating/',bearerAuthPatient, getAllCreatedRating)
 patientRouter.post('/patient/:username/rating/:physicianUN',bearerAuthPatient, postRateFromPatient)
 patientRouter.delete('/patient/:username/rating/:id',bearerAuthPatient, delRateFromPatient)
@@ -400,22 +400,22 @@ async function addVitals (req,res,next){
         if (addedVitals.oxygenSat < 90) {
             notificationCaptured += ` - Oxygen Saturation: ${addedVitals.oxygenSat}`;
         }
-        if (addedVitals.bloodGlucose > 100 || addedVitals.heartRate < 70) {
+        if (addedVitals.bloodGlucose > 100 || addedVitals.bloodGlucose < 70) {
             notificationCaptured += ` - Blood Glucose: ${addedVitals.bloodGlucose}`;
         }
-        if (addedVitals.temperature > 37.1 || addedVitals.heartRate < 36) {
+        if (addedVitals.temperature > 37.1 || addedVitals.temperature < 36) {
             notificationCaptured += ` - Temperature: ${addedVitals.temperature}`;
         }
-        if (addedVitals.systolicBP > 130 || addedVitals.heartRate < 90) {
+        if (addedVitals.systolicBP > 130 || addedVitals.systolicBP < 90) {
             notificationCaptured += ` - Systolic BP: ${addedVitals.systolicBP}`;
         }
-        if (addedVitals.diastolicBP > 90 || addedVitals.heartRate < 60) {
+        if (addedVitals.diastolicBP > 90 || addedVitals.diastolicBP < 60) {
             notificationCaptured += ` - Diastolic BP: ${addedVitals.diastolicBP}`;
         }
 
         console.log(notificationCaptured)
 
-        if(notificationCaptured.length > 5) {
+        if(notificationCaptured.length > 37) {
             let toCreateNotification = await notification.create({
                 event:notificationCaptured,
                 patientUN:username
