@@ -220,7 +220,7 @@ async function  physicianProfileGetHandlder (req, res, next){
                 username:userProfile.username,
                 fullName:userProfile.fullName,
                 gender:userProfile.gender,
-                birthdate:userProfile.birthdate,
+                birthdate:userProfile.birthDate,
                 department:userProfile.department,
             }
             res.status(200).json(result);
