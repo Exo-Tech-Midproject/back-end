@@ -74,14 +74,14 @@
         const base64Credentials = btoa(credentials);
   
         try {
-          const response = await axios.post('http://localhost:3000/login/patient', null, {
+          const response = await axios.post('https://healthak.onrender.com/login/patient', null, {
             headers: {
               'Authorization': `Basic ${base64Credentials}`
             }
           });
           console.log(response)
           if (response.status === 200) {
-            window.location.href = `http://localhost:3000/patient/${username}/chat`;
+            window.location.href = `https://healthak.onrender.com/patient/${username}/chat`;
           } else {
             errorMessage.textContent = 'Invalid login credentials';
           }
