@@ -1,0 +1,66 @@
+[
+
+    {
+        "username": "hasan",
+        "password": "1234",
+        "fullName": "Hasan Tommalieh",
+        "licenseId": 995864,
+        "gender": "male",
+        "birthDate": "1998-08-07",
+        "mobileNumber": "0785520101",
+        "emailAddress": "haznto@gmail.com",
+        "nationalID": "9982022359",
+        "department": "Neurological"
+      },
+
+      {
+        "username": "anas",
+        "fullName": "Anas Nemrawi",
+        "password": "123456",
+        "gender": "male",
+        "birthdate": "1998-08-01",
+        "race": "white",
+        "maritalStatus":"single" ,
+        "mobileNumber":"0775787642" ,
+        "emailAddress": "anasnemrawi@gmail.com"
+        
+      },
+
+      {
+        "heartRate": 88,
+        "oxygenSat": 97,
+        "bloodGlucose": 70,
+        "temperature": 36.9,
+        "systolicBP": 120,
+        "diastolicBP": 80
+      },
+
+      {
+        "title":"How to use Isotears?",
+        "description":"I was wondering if any physician could explain to me how to use Isotears artificial tears and how to store it correctly?"
+      },
+
+
+      {
+        "groupName":"MyPatients"
+        },
+
+        {
+            "title":"How to use Mixtard Insulin",
+            "textContent":"Make sure there is no bubbles inside the pen or vial you are going to use......."
+         },
+
+         {
+            "dateOfIssue":"2023-09-10",
+            "diagnosis": "Diabietes",
+            "medicines": [{"drugname":"Metformin"},{"drugname":"Amaryl","dosage": "one tablet after the meal "}],
+            "signature":"hasanT",
+            "username":"anas"
+    
+    },
+
+    {
+        "allergies":"Soy beans"
+    }
+
+]

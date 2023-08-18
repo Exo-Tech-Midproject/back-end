@@ -82,10 +82,12 @@ patientRouter.put('/patient/:username/chat/:physicianUN/:msgID', bearerAuthPatie
 
 
 
-patientRouter.get('/patient/:username/rating/', bearerAuthPatient, getAllCreatedRating)
-patientRouter.post('/patient/:username/rating/:physicianUN', bearerAuthPatient, postRateFromPatient)
-patientRouter.delete('/patient/:username/rating/:id', bearerAuthPatient, delRateFromPatient)
-patientRouter.put('/patient/:username/rating/:id', bearerAuthPatient, editRateFromPatient)
+// Rating Routes
+patientRouter.get('/patient/:username/rating/',bearerAuthPatient, getAllCreatedRating)
+patientRouter.post('/patient/:username/rating/:physicianUN',bearerAuthPatient, postRateFromPatient)
+patientRouter.delete('/patient/:username/rating/:id',bearerAuthPatient, delRateFromPatient)
+patientRouter.put('/patient/:username/rating/:id',bearerAuthPatient, editRateFromPatient)
+
 
 // Patient Notifications routes
 // patientRouter.post('/patient/:username/notifications',bearerAuthPatient, sendNotificationPatient)
@@ -415,7 +417,9 @@ async function addVitals(req, res, next) {
 
         console.log(notificationCaptured)
 
-        if (notificationCaptured.length > 37) {
+
+        if(notificationCaptured.length > 37) {
+
             let toCreateNotification = await notification.create({
                 event: notificationCaptured,
                 patientUN: username
