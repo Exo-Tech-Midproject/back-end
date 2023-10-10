@@ -17,7 +17,7 @@ function handlePatientSchema(sequelize, DataTypes) {
     token: {
       type: DataTypes.VIRTUAL,
       get() {
-        return jwt.sign({ username: this.username }, SECRET);
+        return jwt.sign({ username: this.username, accountType: this.accountType }, SECRET);
       },
       set(tokenObj) {
         let token = jwt.sign(tokenObj, SECRET);
@@ -95,7 +95,7 @@ function handlePatientSchema(sequelize, DataTypes) {
   });
 
   patient.authenticateBasic = async function (username, password) {
-    
+
     const user = await this.findOne({ where: { username } });
     const valid = await bcrypt.compare(password, user.password);
     if (valid) {
