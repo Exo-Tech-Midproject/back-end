@@ -73,7 +73,7 @@ diseases.belongsTo(physician, { as: 'CreatedBy', foreignKey: 'physicianUN', targ
 // patient - prescription relation
 
 patients.hasMany(prescriptions, { as: 'Prescriptions', foreignKey: 'patientName', sourceKey: 'username' })
-prescriptions.belongsTo(patients, { foreignKey: 'patientName', targetKey: 'username' })
+prescriptions.belongsTo(patients, { as: 'Owner', foreignKey: 'patientName', targetKey: 'username' })
 
 //physician - prescription relation
 

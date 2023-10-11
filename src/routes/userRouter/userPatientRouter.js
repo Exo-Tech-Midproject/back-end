@@ -535,6 +535,11 @@ async function getAllPatientPrescriptions(req, res, next) {
                             as: 'PrescribedBy',
                             attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
                         },
+                        {
+                            model: patient.model,
+                            as: 'Owner',
+                            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race'], // Add the patient attributes you need
+                        },
                     ],
                 });
 

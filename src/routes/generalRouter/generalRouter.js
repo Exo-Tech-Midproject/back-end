@@ -325,7 +325,7 @@ async function handleGetAllPatients(req, res, next) {
         // console.log(username)
 
         const userProfile = await patient.model.findAll({
-            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress'],
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race'],
         })
         // if (!userProfile) {
         //     return res.status(404).json({ error: 'User not found' });
@@ -355,7 +355,7 @@ async function handleGetOnePatient(req, res, next) {
         const username = req.params.username;
         const userProfile = await patient.model.findOne({
             where: { username: username },
-            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress'],
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race'],
         })
         if (!userProfile) throw new Error('user not found')
         res.status(200).json(userProfile);
