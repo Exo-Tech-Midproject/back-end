@@ -83,10 +83,10 @@ patientRouter.put('/patient/:username/chat/:physicianUN/:msgID', bearerAuthPatie
 
 
 // Rating Routes
-patientRouter.get('/patient/:username/rating/',bearerAuthPatient, getAllCreatedRating)
-patientRouter.post('/patient/:username/rating/:physicianUN',bearerAuthPatient, postRateFromPatient)
-patientRouter.delete('/patient/:username/rating/:id',bearerAuthPatient, delRateFromPatient)
-patientRouter.put('/patient/:username/rating/:id',bearerAuthPatient, editRateFromPatient)
+patientRouter.get('/patient/:username/rating/', bearerAuthPatient, getAllCreatedRating)
+patientRouter.post('/patient/:username/rating/:physicianUN', bearerAuthPatient, postRateFromPatient)
+patientRouter.delete('/patient/:username/rating/:id', bearerAuthPatient, delRateFromPatient)
+patientRouter.put('/patient/:username/rating/:id', bearerAuthPatient, editRateFromPatient)
 
 
 // Patient Notifications routes
@@ -418,7 +418,7 @@ async function addVitals(req, res, next) {
         console.log(notificationCaptured)
 
 
-        if(notificationCaptured.length > 37) {
+        if (notificationCaptured.length > 37) {
 
             let toCreateNotification = await notification.create({
                 event: notificationCaptured,
@@ -526,7 +526,18 @@ async function getAllPatientPrescriptions(req, res, next) {
 
             if (user) {
 
-                let records = await prescription.model.findAll({ where: { patientName: username } });
+                // let records = await prescription.model.findAll({ where: { patientName: username } });
+                const records = await prescription.model.findAll({
+                    where: { patientName: username },
+                    include: [
+                        {
+                            model: physician.model,
+                            as: 'PrescribedBy',
+                            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
+                        },
+                    ],
+                });
+
 
                 if (records) {
 

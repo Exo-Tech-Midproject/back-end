@@ -42,7 +42,7 @@ async function sendResetEmail(emailAddress, resetToken) {
 }
 
 
-const { group , physician , patient, appointment} = require('../../models');
+const { group, physician, patient, appointment } = require('../../models');
 const path = require('path');
 
 generalRouter.get('/', homePageHandler)
@@ -52,45 +52,49 @@ generalRouter.get('/physician/:username/chat', bearerAuthphysician, chatPageHand
 generalRouter.get('/physician/:username/chat/with/:targetchat', bearerAuthphysician, targetedChatpagePhys)
 generalRouter.get('/patient/login', logInPageHandlerPatient)
 generalRouter.get('/physician/login', logInPageHandlerPhysician)
-generalRouter.get('/signup',signUpPageHandler);
-generalRouter.post('/patient/forgotpassword/:username',handleForgotPasswordPatient)
-generalRouter.post('/physician/forgotpassword/:username',handleForgotPasswordPhysician)
-generalRouter.post('/patient/resetpassword/:username',handleResetPasswordPatient)
-generalRouter.post('/physician/resetpassword/:username',handleResetPasswordPhysician)
+generalRouter.get('/signup', signUpPageHandler);
+generalRouter.post('/patient/forgotpassword/:username', handleForgotPasswordPatient)
+generalRouter.post('/physician/forgotpassword/:username', handleForgotPasswordPhysician)
+generalRouter.post('/patient/resetpassword/:username', handleResetPasswordPatient)
+generalRouter.post('/physician/resetpassword/:username', handleResetPasswordPhysician)
+generalRouter.get('/allpatients', handleGetAllPatients)
+generalRouter.get('/allphysicians', handleGetAllPhysicians)
+generalRouter.get('/allpatients/:username', handleGetOnePatient)
+generalRouter.get('/allphysicians/:username', handleGetOnePhysician)
 
 
 //------------------------------------------------------------------------------------------
 
 //Routes Functions:
 
-async function homePageHandler (req, res, next){
+async function homePageHandler(req, res, next) {
     res.status(200).json("Welcome to Home Page")
 }
 
 //--- chat test Hasan
-async function chatPageHandler (req, res, next){
-    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'ChooseChat', 'picktochat.html');
+async function chatPageHandler(req, res, next) {
+    const chatHtmlPath = path.join(__dirname, '..', '..', '..', 'ChooseChat', 'picktochat.html');
     res.sendFile(chatHtmlPath)
 
 }
-async function targetedChatpage (req, res, next){
-    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'chatHtml', 'chat.html');
+async function targetedChatpage(req, res, next) {
+    const chatHtmlPath = path.join(__dirname, '..', '..', '..', 'chatHtml', 'chat.html');
     res.sendFile(chatHtmlPath)
 
 }
-async function chatPageHandlerPhys (req, res, next){
-    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'ChooseChat', 'picktoChatPhys.html');
+async function chatPageHandlerPhys(req, res, next) {
+    const chatHtmlPath = path.join(__dirname, '..', '..', '..', 'ChooseChat', 'picktoChatPhys.html');
     res.sendFile(chatHtmlPath)
 
 }
-async function targetedChatpagePhys (req, res, next){
-    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'chatHtml', 'chatPhys.html');
+async function targetedChatpagePhys(req, res, next) {
+    const chatHtmlPath = path.join(__dirname, '..', '..', '..', 'chatHtml', 'chatPhys.html');
     res.sendFile(chatHtmlPath)
 
 }
 //--- chat test Hasan
 
-async function signUpPageHandler (req, res, next){
+async function signUpPageHandler(req, res, next) {
     const welcomeMessage = `
     Welcome to the Signup Page!
     To sign up as a patient, use: /signup/patient
@@ -98,7 +102,7 @@ async function signUpPageHandler (req, res, next){
     res.send(welcomeMessage);
 }
 
-async function logInPageHandlerPatient(req, res, next){
+async function logInPageHandlerPatient(req, res, next) {
     // const response = {
     //     message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
     //     forPhysician: {
@@ -125,126 +129,126 @@ async function logInPageHandlerPatient(req, res, next){
     //         "mobileNumber":"Your mobile Number" ,
     //         "emailAddress": "Your Email"   
     //     }
-        
+
 
     // }
 
     // res.status(200).json(response);
 
     //-------------- new work 
-    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'login', 'login.html');
+    const chatHtmlPath = path.join(__dirname, '..', '..', '..', 'login', 'login.html');
     res.sendFile(chatHtmlPath)
 };
-async function logInPageHandlerPhysician(req, res, next){
+async function logInPageHandlerPhysician(req, res, next) {
     // const response = {
     //     message: "pass your account type you want to login as a param into the url as /physician or /patient then send a post request with your information as shown below format",
     //     forPhysician: {
-            // "username": "Your Username",
-            // "fullName": "Your fullname",
-            // "password": "Yourpassword",
-            // "licenseId": "Your licenseID",
-            // "gender": "Your gender (male/female)",
-            // "birthDate": "Your birthday as (Year-month-day)",
-            // "mobileNumber": "Your mobile Number",
-            // "emailAddress": "Your Email",
-            // "nationalID": "Your National ID",
-            // "department": "The department you work in"
+    // "username": "Your Username",
+    // "fullName": "Your fullname",
+    // "password": "Yourpassword",
+    // "licenseId": "Your licenseID",
+    // "gender": "Your gender (male/female)",
+    // "birthDate": "Your birthday as (Year-month-day)",
+    // "mobileNumber": "Your mobile Number",
+    // "emailAddress": "Your Email",
+    // "nationalID": "Your National ID",
+    // "department": "The department you work in"
     //     },
     //     forPatient: {
-            // "username": "Your Username",
-            // "fullName": "Your fullname",
-            // "password": "Yourpassword",
-            // "gender": "Your gender (male/female)",
-            // "birthdate": "Your birthday as (Year-month-day)",
-            // "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
+    // "username": "Your Username",
+    // "fullName": "Your fullname",
+    // "password": "Yourpassword",
+    // "gender": "Your gender (male/female)",
+    // "birthdate": "Your birthday as (Year-month-day)",
+    // "race": "Your race as hispanic', 'non-hispanic', 'asian', 'african-american', 'american-indian', 'white', 'native-hawaiian",
 
-            // "maritalStatus":"Your maritalStatus as single/married" ,
-            // "mobileNumber":"Your mobile Number" ,
-            // "emailAddress": "Your Email"   
+    // "maritalStatus":"Your maritalStatus as single/married" ,
+    // "mobileNumber":"Your mobile Number" ,
+    // "emailAddress": "Your Email"   
     //     }
-        
+
 
     // }
 
     // res.status(200).json(response);
 
     //-------------- new work 
-    const chatHtmlPath = path.join(__dirname, '..', '..','..', 'login', 'loginPhys.html');
+    const chatHtmlPath = path.join(__dirname, '..', '..', '..', 'login', 'loginPhys.html');
     res.sendFile(chatHtmlPath)
 };
 
 
-async function handleForgotPasswordPatient (req, res, next)  {
+async function handleForgotPasswordPatient(req, res, next) {
     try {
 
         const username = req.params.username;
         const { emailAddress } = req.body;
-    
+
         const user = await patient.getByUN(username);
         //console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu", user)
-    
-        if(!user) throw new Error(`user doesn't exist`)
-    
-    
+
+        if (!user) throw new Error(`user doesn't exist`)
+
+
         const resetToken = generateResetToken();
         user.resetToken = resetToken;
         let obj = {
             resetToken: resetToken
         }
         let savedData = await patient.updateByUN(username, obj);
-    
+
         //console.log('resetToken', user.resetToken)
-    
-    
+
+
         sendResetEmail(emailAddress, resetToken);
-    
+
         res.status(200).json({ message: 'Password reset email sent', obj });
-    }catch (err){
+    } catch (err) {
         next(err)
     }
 };
-async function handleForgotPasswordPhysician (req, res, next)  {
+async function handleForgotPasswordPhysician(req, res, next) {
     try {
         const username = req.params.username;
         const { emailAddress } = req.body;
-    
+
         const user = await physician.getByUN(username);
         //console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu", user)
-    
-        if(!user) throw new Error(`user doesn't exist`)
-    
-    
+
+        if (!user) throw new Error(`user doesn't exist`)
+
+
         const resetToken = generateResetToken();
         user.resetToken = resetToken;
         let obj = {
             resetToken: resetToken
         }
         let savedData = await physician.updateByUN(username, obj);
-    
+
         //console.log('resetToken', user.resetToken)
-    
-    
+
+
         sendResetEmail(emailAddress, resetToken);
-    
+
         res.status(200).json({ message: 'Password reset email sent', obj });
-    }catch (err){
-           next(err)
-       }
+    } catch (err) {
+        next(err)
+    }
 };
 
- async function handleResetPasswordPatient (req, res, next)  {
-    try{
+async function handleResetPasswordPatient(req, res, next) {
+    try {
 
         const username = req.params.username;
         const { resetToken, newPassword } = req.body;
-    
-    
+
+
         let hashedPass = await bcrypt.hash(newPassword, 10);
         // console.log(hashPassword, "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvs")
-    
-    
+
+
         const user = await patient.getByUN(username);
-    
+
         if (!user) {
             return res.status(404).json({ error: 'Invalid user' });
         }
@@ -253,38 +257,38 @@ async function handleForgotPasswordPhysician (req, res, next)  {
         if (user.resetToken !== resetToken) {
             return res.status(400).json({ error: 'Invalid reset token' });
         }
-    
+
         // user.password = newPassword;
-    
+
         // console.log(user.password,'pppppppppppppppppppppppppass')
         let obj = {
             resetToken: "",
             password: hashedPass
         }; // Remove the reset token
-    
+
         let savedData = await patient.updateByUN(username, obj);
         const userAfter = await patient.getByUN(username);
         // console.log(userAfter, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    
+
         res.status(200).json({ message: 'Password reset successfully', obj });
-    }catch(err){
+    } catch (err) {
         next(err)
     }
 
 }
- async function handleResetPasswordPhysician (req, res, next)  {
-    try{
-        
+async function handleResetPasswordPhysician(req, res, next) {
+    try {
+
         const username = req.params.username;
         const { resetToken, newPassword } = req.body;
-    
-    
+
+
         let hashedPass = await bcrypt.hash(newPassword, 10);
         // console.log(hashPassword, "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvs")
-    
-    
+
+
         const user = await physician.getByUN(username);
-    
+
         if (!user) {
             return res.status(404).json({ error: 'Invalid user' });
         }
@@ -293,24 +297,84 @@ async function handleForgotPasswordPhysician (req, res, next)  {
         if (user.resetToken !== resetToken) {
             return res.status(400).json({ error: 'Invalid reset token' });
         }
-    
+
         // user.password = newPassword;
-    
+
         // console.log(user.password,'pppppppppppppppppppppppppass')
         let obj = {
             resetToken: "",
             password: hashedPass
         }; // Remove the reset token
-    
+
         let savedData = await physician.updateByUN(username, obj);
         const userAfter = await physician.getByUN(username);
         // console.log(userAfter, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-    
+
         res.status(200).json({ message: 'Password reset successfully', obj });
-    }catch(err) {
+    } catch (err) {
         next(err)
     }
 
+}
+
+//---------------------------------------------------------- New Routes
+async function handleGetAllPatients(req, res, next) {
+    try {
+
+        // const username = req.params.username;
+        // console.log(username)
+
+        const userProfile = await patient.model.findAll({
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress'],
+        })
+        // if (!userProfile) {
+        //     return res.status(404).json({ error: 'User not found' });
+        // } else {
+
+        //     res.status(200).json(result);
+
+        // }
+        res.status(200).json(userProfile);
+    } catch (err) {
+        next(err)
+    }
+}
+async function handleGetAllPhysicians(req, res, next) {
+    try {
+        const userProfile = await physician.model.findAll({
+            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
+        })
+
+        res.status(200).json(userProfile);
+    } catch (err) {
+        next(err)
+    }
+}
+async function handleGetOnePatient(req, res, next) {
+    try {
+        const username = req.params.username;
+        const userProfile = await patient.model.findOne({
+            where: { username: username },
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress'],
+        })
+        if (!userProfile) throw new Error('user not found')
+        res.status(200).json(userProfile);
+    } catch (err) {
+        next(err)
+    }
+}
+async function handleGetOnePhysician(req, res, next) {
+    try {
+        const username = req.params.username;
+        const userProfile = await physician.model.findOne({
+            where: { username: username },
+            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
+        })
+        if (!userProfile) throw new Error('user not found')
+        res.status(200).json(userProfile);
+    } catch (err) {
+        next(err)
+    }
 }
 
 module.exports = generalRouter;
