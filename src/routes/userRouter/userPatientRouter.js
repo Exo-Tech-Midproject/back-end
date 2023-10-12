@@ -177,20 +177,23 @@ async function patientProfileGetHandlder(req, res, next) {
         const username = req.params.username;
         // console.log(username)
 
-        const userProfile = await patient.getByUN(username);
+        const userProfile = await patient.model.findOne({
+            where: { username: username },
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race']
+        });
 
         if (!userProfile) {
             return res.status(404).json({ error: 'User not found' });
         } else {
-            let result = {
-                username: userProfile.username,
-                fullName: userProfile.fullName,
-                gender: userProfile.gender,
-                birthdate: userProfile.birthdate,
-                race: userProfile.race,
-                maritalStatus: userProfile.maritalStatus
-            }
-            res.status(200).json(result);
+            // let result = {
+            //     username: userProfile.username,
+            //     fullName: userProfile.fullName,
+            //     gender: userProfile.gender,
+            //     birthdate: userProfile.birthdate,
+            //     race: userProfile.race,
+            //     maritalStatus: userProfile.maritalStatus
+            // }
+            res.status(200).json(userProfile);
         }
     } catch (err) {
         next(err)
