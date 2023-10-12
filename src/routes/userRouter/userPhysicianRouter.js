@@ -211,21 +211,24 @@ async function physicianProfileGetHandlder(req, res, next) {
         const username = req.params.username;
 
 
-        const userProfile = await physician.getByUN(username);
-
+        // const userProfile = await physician.getByUN(username);
+        const userProfile = await physician.model.findOne({
+            where: { username: username },
+            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address']
+        });
         if (!userProfile) {
             return res.status(404).json({ error: 'User not found' });
         } else {
-            let result = {
+            // let result = {
 
-                username:userProfile.username,
-                fullName:userProfile.fullName,
-                gender:userProfile.gender,
-                birthdate:userProfile.birthDate,
-                department:userProfile.department,
+            //     username:userProfile.username,
+            //     fullName:userProfile.fullName,
+            //     gender:userProfile.gender,
+            //     birthdate:userProfile.birthDate,
+            //     department:userProfile.department,
 
-            }
-            res.status(200).json(result);
+            // }
+            res.status(200).json(userProfile);
         }
     } catch (err) {
         next(err)
