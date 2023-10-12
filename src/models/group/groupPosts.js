@@ -17,6 +17,9 @@ function handleGroupPosts(sequelize, DataTypes) {
         textContent: {
             type: DataTypes.TEXT,
             allowNull: false,
+        },
+        postImage: {
+            type: DataTypes.STRING
         }
     })
     return groupPosts;

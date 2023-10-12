@@ -10,7 +10,14 @@ function handleGroupSchema(sequelize, DataTypes) {
     physicianUN:{
         type: DataTypes.STRING,
         allowNull: false
-    }
+    },
+    groupImage: {
+        type: DataTypes.STRING
+    },
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+    },
     
     })
     return group;

@@ -728,7 +728,8 @@ it("delete to /physician/:username/patients/:patientUN/prescriptions/:id no info
     const res = await req
     .post("/physician/Hasan1/groups").send({
         groupName:"group1",
-        physicianUN:"Hasan1"
+        physicianUN:"Hasan1",
+        description:"the first description"
     })
     .set("Authorization", `Bearer ${token}`);
 
