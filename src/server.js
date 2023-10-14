@@ -10,41 +10,46 @@ const moment = require('moment')
 const http = require('http')
 const { Server } = require("socket.io");
 const server = http.createServer(app)
-const io = new Server(server);
+const io = new Server(server, { pingTimeout: 60000, cors: { origin: '*' } });
 
 
 
 io.on('connection', (socket) => {
     console.log(`socket with id ${socket.id} is connected`)
-    socket.on('enter chat' , (payload) => {
+    socket.on('tryme', (payload) => {
+        console.log(payload)
+    })
+    socket.on('enter chat', (payload) => {
         let socketName = payload.username
         let socketTime = moment().format('h:mm a')
-        
+
+        // console.log(payload)
         socket.join(`${payload.roomName}`)
         let obj = {
-            msg:`${socketName} is  Online`,
+            msg: `${socketName} is  Online`,
             name: payload.username,
             time: socketTime
-          }
-        socket.broadcast.to(payload.roomName).emit('chat message',obj)
+        }
+        // socket.broadcast.to(payload.roomName).emit('chat message', obj)
         socket.on('chat message', (msg) => {
-            
+            console.log(msg, '22222')
             io.to(payload.roomName).emit('chat message', msg);
         })
-        
+
         socket.on('disconnect', () => {
-            let obj = {
-                msg:`${socketName} is Offline`,
-                name: payload.username,
-                time: socketTime
-              }
-            io.to(payload.roomName).emit('chat message',obj)
+            // let obj = {
+            //     msg: `${socketName} is Offline`,
+            //     name: payload.username,
+            //     time: socketTime
+            // }
+            console.log('disconnected')
+            // io.to(payload.roomName).emit('chat message', obj)
         })
     })
-    
-    
-    socket.on('left-chat' ,(payload) => {
-        console.log(payload,'aaaaaaaaaaaaaa')
+
+
+    socket.on('left-chat', (payload) => {
+        console.log(payload, 'aaaaaaaaaaaaaa')
     })
 })
 
@@ -52,7 +57,7 @@ io.on('connection', (socket) => {
 let vitalsNotification = io.of('/notifications')
 
 vitalsNotification.on('connection', (socket) => {
-socket.on('problem')
+    socket.on('problem')
 })
 
 //-------------------
@@ -75,7 +80,7 @@ const genenralRoute = require("./routes/generalRouter/generalRouter")
 // using libraries ------------------------------------
 
 app.use(express.json())
-app.use(cors())
+app.use(cors({ origin: '*' }))
 app.use(morgan('dev'))
 app.use(cookieParser());
 
@@ -102,7 +107,7 @@ app.use(errorHandler);
 
 function start(port) {
     server.listen(port, () => console.log(`up and running on port ${port}`))
-    
+
 }
 
 module.exports = { start, app }
