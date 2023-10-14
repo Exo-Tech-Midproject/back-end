@@ -20,20 +20,24 @@ io.on('connection', (socket) => {
         console.log(payload)
     })
     socket.on('enter chat', (payload) => {
-        let socketName = payload.username
-        let socketTime = moment().format('h:mm a')
+        // let socketName = payload.username
+        // let socketTime = moment().format('h:mm a')
 
         // console.log(payload)
-        socket.join(`${payload.roomName}`)
-        let obj = {
-            msg: `${socketName} is  Online`,
-            name: payload.username,
-            time: socketTime
-        }
-        // socket.broadcast.to(payload.roomName).emit('chat message', obj)
+        socket.join(`${payload}`)
+        // let obj = {
+        //     msg: `${socketName} is  Online`,
+        //     name: payload.username,
+        //     time: socketTime
+        // }
+        // socket.broadcast.to(payload).emit('chat message', obj)
         socket.on('chat message', (msg) => {
+            console.log(payload)
             console.log(msg, '22222')
-            io.to(payload.roomName).emit('chat message', msg);
+            io.to(payload).emit('chat message', msg);
+        })
+        socket.on('leave-room', (payload) => {
+            socket.leave(payload)
         })
 
         socket.on('disconnect', () => {
