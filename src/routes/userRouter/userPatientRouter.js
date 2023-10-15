@@ -4,6 +4,9 @@ const express = require('express');
 const patientRouter = express.Router();
 const basicAuthPatient = require('../../middleware/auth/basicPatient')
 const bearerAuthPatient = require('../../middleware/auth/bearerPatient')
+const { storage, cloudinary } = require('../../cloudinary/cloudinary')
+const multer = require('multer')
+const upload = multer({ storage })
 
 
 
@@ -94,6 +97,10 @@ patientRouter.put('/patient/:username/rating/:id', bearerAuthPatient, editRateFr
 
 
 
+//patient upload images route
+patientRouter.post('/patient/:username/uploadpfp', bearerAuthPatient, upload.single('image'), handleProfileImage)
+// patientRouter.post('/patient/:username/uploadcover', bearerAuthPatient, upload.single('image'), handleCoverImage)
+// patientRouter.post('/patient/:username/rating/:physicianUN', bearerAuthPatient, postRateFromPatient)
 
 
 
@@ -179,7 +186,7 @@ async function patientProfileGetHandlder(req, res, next) {
 
         const userProfile = await patient.model.findOne({
             where: { username: username },
-            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race']
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg']
         });
 
         if (!userProfile) {
@@ -997,6 +1004,31 @@ async function delRateFromPatient(req, res, next) {
 
 
 
+//----------------------------------------------------------------- Upload  handlers
+//---------------------------------------------------------------------------------
 
+async function handleProfileImage(req, res, next) {
+    try {
+        const { username } = req.params
+
+
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const { secure_url } = result;
+        // const userId = req.params.id;
+
+        // Update the user's profileImg using the userId
+        let userData = await patient.model.update({ profileImg: secure_url }, { where: { username: username } });
+
+        // res.json({ message: 'Image uploaded and profile updated successfully!' });
+        console.log(req.body, req.file)
+        res.status(201).json(userData)
+
+    } catch (err) {
+        next(err)
+    }
+}
+
+
+//---------------------------------------------------------------------------------
 module.exports = patientRouter;
 
