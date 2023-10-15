@@ -99,7 +99,7 @@ patientRouter.put('/patient/:username/rating/:id', bearerAuthPatient, editRateFr
 
 //patient upload images route
 patientRouter.post('/patient/:username/uploadpfp', bearerAuthPatient, upload.single('image'), handleProfileImage)
-// patientRouter.post('/patient/:username/uploadcover', bearerAuthPatient, upload.single('image'), handleCoverImage)
+patientRouter.post('/patient/:username/uploadcover', bearerAuthPatient, upload.single('image'), handleCoverImage)
 // patientRouter.post('/patient/:username/rating/:physicianUN', bearerAuthPatient, postRateFromPatient)
 
 
@@ -1018,6 +1018,26 @@ async function handleProfileImage(req, res, next) {
 
         // Update the user's profileImg using the userId
         let userData = await patient.model.update({ profileImg: secure_url }, { where: { username: username } });
+
+        // res.json({ message: 'Image uploaded and profile updated successfully!' });
+        console.log(req.body, req.file)
+        res.status(201).json(userData)
+
+    } catch (err) {
+        next(err)
+    }
+}
+async function handleCoverImage(req, res, next) {
+    try {
+        const { username } = req.params
+
+
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const { secure_url } = result;
+        // const userId = req.params.id;
+
+        // Update the user's profileImg using the userId
+        let userData = await patient.model.update({ coverImg: secure_url }, { where: { username: username } });
 
         // res.json({ message: 'Image uploaded and profile updated successfully!' });
         console.log(req.body, req.file)
