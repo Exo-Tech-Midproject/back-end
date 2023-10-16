@@ -164,7 +164,8 @@ async function handleAllSubscriptions(req, res, next) {
         if (!patientName) throw new Error(`patient doesn't exist`)
 
         let allSubscriptions = await patientName.getSubscription({
-            attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName']
+            // attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName'] // Last Edit
+            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg']
         })
 
         if (!allSubscriptions[0]) throw new Error('You got no subscriptions yet')
@@ -543,12 +544,12 @@ async function getAllPatientPrescriptions(req, res, next) {
                         {
                             model: physician.model,
                             as: 'PrescribedBy',
-                            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
+                            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg'],
                         },
                         {
                             model: patient.model,
                             as: 'Owner',
-                            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race'], // Add the patient attributes you need
+                            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg'], // Add the patient attributes you need
                         },
                     ],
                 });
