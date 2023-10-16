@@ -76,6 +76,14 @@ function handlePhysicianSchema(sequelize, DataTypes) {
     address: {
       type: DataTypes.STRING
     },
+    profileImg: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    coverImg: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     resetToken: {
       type: DataTypes.STRING,
       allowNull: true,

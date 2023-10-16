@@ -1,6 +1,6 @@
 "use strict";
 
-const {patient} = require("../../models");
+const { patient } = require("../../models");
 
 module.exports = async (req, res, next) => {
   try {
@@ -8,6 +8,7 @@ module.exports = async (req, res, next) => {
 
     if (req.headers.authorization) {
       token = req.headers.authorization.split(" ").pop();
+      // console.log(token)
     } else if (req.cookies.authToken) {
       token = req.cookies.authToken;
     } else {

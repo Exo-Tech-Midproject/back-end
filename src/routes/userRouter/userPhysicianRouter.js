@@ -5,6 +5,9 @@ const physicianRouter = express.Router();
 const basicAuthPhysician = require('../../middleware/auth/basicPhysician')
 const bearerAuthphysician = require('../../middleware/auth/bearerPhysician')
 const sequelize = require('sequelize')
+const { storage, cloudinary } = require('../../cloudinary/cloudinary')
+const multer = require('multer')
+const upload = multer({ storage })
 
 
 
@@ -101,9 +104,13 @@ physicianRouter.get('/physician/:username/notifications', bearerAuthphysician, g
 
 
 
+//patient upload images route
+physicianRouter.post('/physician/:username/uploadpfp', bearerAuthphysician, upload.single('image'), handlePhysicianProfileImage)
+physicianRouter.post('/physician/:username/uploadcover', bearerAuthphysician, upload.single('image'), handlePhysicianCoverImage)
 
-
-
+//Group && PostsImages
+physicianRouter.post('/physician/:username/groups/:id/groupImg', bearerAuthphysician, upload.single('image'), handlePhysicianGroupImage)
+physicianRouter.post('/physician/:username/groups/:id/posts/:postID/postImg', bearerAuthphysician, upload.single('image'), handlePhysicianPostImage)
 // Functions
 
 
@@ -214,7 +221,7 @@ async function physicianProfileGetHandlder(req, res, next) {
         // const userProfile = await physician.getByUN(username);
         const userProfile = await physician.model.findOne({
             where: { username: username },
-            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address']
+            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg', 'nationalID']
         });
         if (!userProfile) {
             return res.status(404).json({ error: 'User not found' });
@@ -1467,6 +1474,120 @@ async function getAllNotifications(req, res, next) {
 
         //   console.log(arr)
         res.status(200).json(finalArr)
+
+    } catch (err) {
+        next(err)
+    }
+}//----------------------------------------------------------------- Upload  handlers
+//---------------------------------------------------------------------------------
+
+async function handlePhysicianProfileImage(req, res, next) {
+    try {
+        const { username } = req.params
+
+
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const { secure_url } = result;
+        // const userId = req.params.id;
+
+        // Update the user's profileImg using the userId
+        let userData = await physician.model.update({ profileImg: secure_url }, { where: { username: username } });
+
+        // res.json({ message: 'Image uploaded and profile updated successfully!' });
+        console.log(req.body, req.file)
+        res.status(201).json(userData)
+
+    } catch (err) {
+        next(err)
+    }
+}
+async function handlePhysicianCoverImage(req, res, next) {
+    try {
+        const { username } = req.params
+
+
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const { secure_url } = result;
+        // const userId = req.params.id;
+
+        // Update the user's profileImg using the userId
+        let userData = await physician.model.update({ coverImg: secure_url }, { where: { username: username } });
+
+        // res.json({ message: 'Image uploaded and profile updated successfully!' });
+        console.log(req.body, req.file)
+        res.status(201).json(userData)
+
+    } catch (err) {
+        next(err)
+    }
+}
+async function handlePhysicianGroupImage(req, res, next) {
+    try {
+        const { username, id } = req.params
+
+        let foundphysician = await physician.getByUN(username)
+        if (!foundphysician) throw new Error('physician not found')
+
+        let groupsFound = await group.model.findOne({
+            where: {
+                physicianUN: username,
+                id: id
+
+            }
+        })
+
+        if (!groupsFound) throw new Error(`This group doesn't exist`)
+
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const { secure_url } = result;
+        // const userId = req.params.id;
+
+        // Update the user's profileImg using the userId
+        let userData = await group.model.update({ groupImage: secure_url }, { where: { id: id } });
+
+        // res.json({ message: 'Image uploaded and profile updated successfully!' });
+        console.log(req.body, req.file)
+        res.status(201).json(userData)
+
+    } catch (err) {
+        next(err)
+    }
+}
+async function handlePhysicianPostImage(req, res, next) {
+    try {
+        const { username, id, postID } = req.params
+        let foundphysician = await physician.getByUN(username)
+        if (!foundphysician) throw new Error('physician not found')
+        let foundGroup = await group.model.findOne({
+            where: {
+                physicianUN: username,
+                id: id
+            }
+
+        })
+        if (!foundGroup) throw new Error(`You don't own that group`)
+        let groupsPostsFound = await groupPosts.model.findOne({
+            where: {
+                author: username,
+                groupId: id,
+                id: postID
+
+            }
+        })
+
+        if (!groupsPostsFound) throw new Error(`Post doesn't exist`)
+
+
+        const result = await cloudinary.uploader.upload(req.file.path);
+        const { secure_url } = result;
+        // const userId = req.params.id;
+
+        // Update the user's profileImg using the userId
+        let userData = await groupPosts.model.update({ postImage: secure_url }, { where: { id: postID } });
+
+        // res.json({ message: 'Image uploaded and profile updated successfully!' });
+        console.log(req.body, req.file)
+        res.status(201).json(userData)
 
     } catch (err) {
         next(err)

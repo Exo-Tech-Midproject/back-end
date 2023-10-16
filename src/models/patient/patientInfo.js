@@ -79,6 +79,14 @@ function handlePatientSchema(sequelize, DataTypes) {
         isEmail: true
       }
     },
+    profileImg: {
+      type: DataTypes.STRING,
+      allowNull:true
+    },
+    coverImg: {
+      type: DataTypes.STRING,
+      allowNull:true
+    },
     resetToken: {
       type: DataTypes.STRING,
       defaultValue: ''
