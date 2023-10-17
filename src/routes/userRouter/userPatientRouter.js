@@ -816,7 +816,7 @@ async function getAllmessagesforPatient(req, res, next) {
             }
         });
 
-        if (!allMessages[0]) throw new Error(`You don't have messeges with this physician yet!`)
+        // if (!allMessages[0]) throw new Error(`You don't have messeges with this physician yet!`)
 
         res.status(200).json(allMessages)
     } catch (err) {
