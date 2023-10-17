@@ -178,7 +178,8 @@ async function handleSubscirbe(req, res, next) {
         await physicianName.addSubscriber(patientName)
 
         let result = await physicianName.getSubscriber({
-            attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName']
+            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg']
+
         })
 
 
@@ -199,7 +200,8 @@ async function handleAllSubscribers(req, res, next) {
         if (!physicianName) throw new Error(`Physician doesn't exist`)
 
         let allSubscribers = await physicianName.getSubscriber({
-            attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName']
+            // attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName']
+            attributes: ['username', 'fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg']
         })
 
         if (!allSubscribers[0]) throw new Error('You got no subscribers yet')
@@ -221,7 +223,7 @@ async function physicianProfileGetHandlder(req, res, next) {
         // const userProfile = await physician.getByUN(username);
         const userProfile = await physician.model.findOne({
             where: { username: username },
-            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg', 'nationalID']
+            attributes: ['fullName', 'username', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg', 'nationalID']
         });
         if (!userProfile) {
             return res.status(404).json({ error: 'User not found' });
@@ -965,7 +967,19 @@ async function handleAllUserPrescriptions(req, res, next) {
             let allPrescriptions = await prescription.model.findAll({
                 where: {
                     physicianName: username
-                }
+                },
+                include: [
+                    {
+                        model: physician.model,
+                        as: 'PrescribedBy',
+                        attributes: ['username', 'fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg'],
+                    },
+                    {
+                        model: patient.model,
+                        as: 'Owner',
+                        attributes: ['username', 'fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg'], // Add the patient attributes you need
+                    },
+                ]
             })
 
             if (allPrescriptions[0]) {
@@ -1000,7 +1014,19 @@ async function getOnePatientAllPrescriptions(req, res, next) {
                     where: {
                         physicianName: username,
                         patientName: patientUN
-                    }
+                    },
+                    include: [
+                        {
+                            model: physician.model,
+                            as: 'PrescribedBy',
+                            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg'],
+                        },
+                        {
+                            model: patient.model,
+                            as: 'Owner',
+                            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg'], // Add the patient attributes you need
+                        },
+                    ],
                 })
                 if (allPrescriptions[0]) {
 

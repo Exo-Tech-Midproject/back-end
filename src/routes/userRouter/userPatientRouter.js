@@ -31,6 +31,7 @@ patientRouter.get('/logout', logoutHandler)
 
 // patient subscription routes
 patientRouter.get('/patient/:username/physicians/subscriptions', bearerAuthPatient, handleAllSubscriptions)
+patientRouter.get('/patient/:username/patients/:physicianUN/subscribe', bearerAuthPatient, handleSubscirbePatient)
 
 // patient profile routes
 patientRouter.get('/patient/:username/profile', bearerAuthPatient, patientProfileGetHandlder)
@@ -164,13 +165,48 @@ async function handleAllSubscriptions(req, res, next) {
         if (!patientName) throw new Error(`patient doesn't exist`)
 
         let allSubscriptions = await patientName.getSubscription({
-            attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName']
+            // attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName'] // Last Edit
+            attributes: ['username', 'nationalID', 'fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg']
+
         })
 
         if (!allSubscriptions[0]) throw new Error('You got no subscriptions yet')
 
 
         res.status(200).json(allSubscriptions)
+    } catch (err) {
+        next(err)
+    }
+}
+async function handleSubscirbePatient(req, res, next) {
+    const { username, physicianUN } = req.params
+    try {
+        console.log(patientUN, username)
+        let patientName = await patient.getByUN(username)
+        let physicianName = await patient.getByUN(physicianUN)
+
+
+
+        if (!physicianName || !patientName) throw new Error(`Patient or Physician doesn't exist`)
+
+        let exist = await patientName.getSubscription({
+            where: {
+                username: physicianUN
+            }
+        })
+
+        if (exist[0]) throw new Error('This physician already is a subscription')
+
+        console.log(physicianName, patientName)
+        await patientName.addSubscription(physicianName)
+
+        let result = await patientName.getSubscription({
+            attributes: ['fullName', 'username', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg', 'nationalID']
+
+        })
+
+
+        res.status(200).json(result)
     } catch (err) {
         next(err)
     }
@@ -186,7 +222,7 @@ async function patientProfileGetHandlder(req, res, next) {
 
         const userProfile = await patient.model.findOne({
             where: { username: username },
-            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg']
+            attributes: ['username', 'fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg']
         });
 
         if (!userProfile) {
@@ -543,12 +579,12 @@ async function getAllPatientPrescriptions(req, res, next) {
                         {
                             model: physician.model,
                             as: 'PrescribedBy',
-                            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
+                            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg'],
                         },
                         {
                             model: patient.model,
                             as: 'Owner',
-                            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race'], // Add the patient attributes you need
+                            attributes: ['fullName', 'insurance', 'gender', 'birthdate', 'maritalStatus', 'mobileNumber', 'emailAddress', 'race', 'profileImg', 'coverImg'], // Add the patient attributes you need
                         },
                     ],
                 });
