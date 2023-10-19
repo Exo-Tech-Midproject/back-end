@@ -781,9 +781,9 @@ it("put to /physician/:username/groups/:id", async () => {
     expect(res.status).toBe(200);
 });
 
-it("get to /patient/:username/groups/:groupName", async () => {
+it("get to /patient/:username/groups/:id", async () => {
     const res = await req
-    .get("/patient/test2/groups/group2")
+    .get("/patient/test2/groups/1")
     .set("Authorization", `Bearer ${token2}`);
     
     expect(res.status).toBe(200);
