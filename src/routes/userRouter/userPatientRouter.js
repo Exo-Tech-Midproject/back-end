@@ -161,7 +161,7 @@ async function handleAllSubscriptions(req, res, next) {
 
         if (!patientName) throw new Error(`Patient doesn't exist`);
 
-        let allSubscriptions = await patientName.getSubscription({
+        const allSubscriptions = await patientName.getSubscription({
             attributes: [
                 'username',
                 'nationalID',
@@ -174,23 +174,39 @@ async function handleAllSubscriptions(req, res, next) {
                 'department',
                 'address',
                 'profileImg',
-                'coverImg',
-                [Sequelize.fn('AVG', Sequelize.col('Rating.rating')), 'avgRating'] // Compute the average rating
+                'coverImg'
             ],
             include: [
                 {
                     model: rating.model,
                     as: 'Rating',
-                    attributes: ['rating', 'physician', 'patient']
-                },
-
-            ],
-            
+                    attributes: []
+                }
+            ]
         });
 
-        if (!allSubscriptions[0]) throw new Error('You have no subscriptions yet');
+        const ratings = await rating.model.findAll({
+            attributes: [
+                [Sequelize.fn('avg', Sequelize.col('rating')), 'avgRating'],
+                'physician'
+            ],
+            where: {
+                physician: allSubscriptions.map(subscription => subscription.username)
+            },
+            group: ['physician']
+        });
 
-        res.status(200).json(allSubscriptions);
+        const subscriptionData = allSubscriptions.map(subscription => {
+            const foundRating = ratings.find(rating => rating.physician === subscription.username);
+            return {
+                ...subscription.toJSON(),
+                avgRating: foundRating ? foundRating.dataValues.avgRating : null
+            };
+        });
+
+        if (!subscriptionData[0]) throw new Error('You have no subscriptions yet');
+
+        res.status(200).json(subscriptionData);
     } catch (err) {
         next(err);
     }
