@@ -185,6 +185,10 @@ async function handleAllSubscriptions(req, res, next) {
                     model: rating.model,
                     as: 'Rating', // Modify this to match the alias in the association
                     attributes: ['rating', 'physician', 'patient']
+                },
+                {
+                    model: physician.model, // Assuming you have defined the Physician model
+                    attributes: [] // Add attributes if needed
                 }
             ]
         });
