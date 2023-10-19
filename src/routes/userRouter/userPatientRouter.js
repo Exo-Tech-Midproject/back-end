@@ -175,18 +175,17 @@ async function handleAllSubscriptions(req, res, next) {
                 'address',
                 'profileImg',
                 'coverImg',
-                [
-                    Sequelize.literal('(SELECT avg(rating) FROM ratings WHERE ratings.physician = physician.username)'),
-                    'avgRating'
-                ]
+                [Sequelize.fn('AVG', Sequelize.col('Rating.rating')), 'avgRating'] // Compute the average rating
             ],
             include: [
                 {
                     model: rating.model,
-                    as: 'Rating', // Modify this to match the alias in the association
+                    as: 'Rating',
                     attributes: ['rating', 'physician', 'patient']
-                }
-            ]
+                },
+
+            ],
+            
         });
 
         if (!allSubscriptions[0]) throw new Error('You have no subscriptions yet');
