@@ -27,6 +27,7 @@ const e = require('express');
 
 //Signup & login patient routes
 physicianRouter.post('/signup/physician', signupPhysicianHandler);
+// physicianRouter.post('/signup/physician/checks', signupPhysicianCheckers);
 physicianRouter.post('/login/physician', basicAuthPhysician, loginPhysiciantHandler)
 physicianRouter.get('/logout', logoutHandler)
 
@@ -131,6 +132,19 @@ async function signupPhysicianHandler(req, res, next) {
         next(e.message)
     }
 }
+// async function signupPhysicianCheckers(req, res, next) {
+//     try {
+//         // req.body.username = req.body.username.toLowerCase()
+//         let user = await physician.create(req.body);
+//         const output = {
+//             user: user,
+//             token: user.token
+//         };
+//         res.status(201).json(output);
+//     } catch (e) {
+//         next(e.message)
+//     }
+// }
 async function loginPhysiciantHandler(req, res, next) {
     try {
         const user = {

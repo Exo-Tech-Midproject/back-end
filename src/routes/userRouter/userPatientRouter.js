@@ -13,9 +13,10 @@ const upload = multer({ storage })
 
 
 
+
 const { group, physician, patient, appointment, vital, disease, prescription, QuestionAnswer, Comment, groupPosts, messages, rating, notification } = require('../../models');
 
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
 
 
@@ -45,7 +46,7 @@ patientRouter.get('/patient/:username/appointments/:id', bearerAuthPatient, getA
 
 // patient Groups routes
 patientRouter.get('/patient/:username/groups', bearerAuthPatient, getpatientGroup);
-patientRouter.get('/patient/:username/groups/:groupName', bearerAuthPatient, getOnepatientGroup);
+patientRouter.get('/patient/:username/groups/:id', bearerAuthPatient, getOnepatientGroup);
 // patient Groups posts routes
 
 patientRouter.get('/patient/:username/groups/:id/posts', bearerAuthPatient, getAllgroupsPosts);
@@ -154,28 +155,46 @@ async function logoutHandler(req, res) {
 //----------------------------------------------------------------------------------
 
 async function handleAllSubscriptions(req, res, next) {
-    const { username } = req.params
+    const { username } = req.params;
     try {
+        let patientName = await patient.getByUN(username);
 
-        let patientName = await patient.getByUN(username)
-
-
-
-
-        if (!patientName) throw new Error(`patient doesn't exist`)
+        if (!patientName) throw new Error(`Patient doesn't exist`);
 
         let allSubscriptions = await patientName.getSubscription({
-            // attributes: ['username', 'mobileNumber', 'emailAddress', 'gender', 'fullName'] // Last Edit
-            attributes: ['username', 'nationalID', 'fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg']
+            attributes: [
+                'username',
+                'nationalID',
+                'fullName',
+                'licenseId',
+                'gender',
+                'birthDate',
+                'mobileNumber',
+                'emailAddress',
+                'department',
+                'address',
+                'profileImg',
+                'coverImg'
+            ],
+            include: [
+                {
+                    model: rating.model,
+                    as: 'Rating', // Modify this to match the alias in the association
+                    attributes: [
+                        'rating',
+                        'physician',
+                        'patient',
+                        [Sequelize.literal('(SELECT avg(`rating`) FROM `ratings` WHERE `ratings`.`physician` = `physician`.`username`)'), 'avgRating']
+                    ]
+                }
+            ]
+        });
 
-        })
+        if (!allSubscriptions[0]) throw new Error('You have no subscriptions yet');
 
-        if (!allSubscriptions[0]) throw new Error('You got no subscriptions yet')
-
-
-        res.status(200).json(allSubscriptions)
+        res.status(200).json(allSubscriptions);
     } catch (err) {
-        next(err)
+        next(err);
     }
 }
 async function handleSubscirbePatient(req, res, next) {
@@ -346,15 +365,22 @@ async function getpatientGroup(req, res, next) {
 }
 async function getOnepatientGroup(req, res, next) {
     try {
-        const { username, groupName } = req.params
+        const { username, id } = req.params
         let foundpatient = await patient.getByUN(username)
         if (!foundpatient) throw new Error('patient not found')
 
         let groupsFound = await foundpatient.getGroup(
             {
                 where: {
-                    groupName: groupName
-                }
+                    id: id
+                },
+                include: [
+                    {
+                        model: physician.model,
+                        as: 'Maker',
+                        attributes: ['fullName', 'username', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg', 'nationalID']
+                    }
+                ]
             }
         )
 
