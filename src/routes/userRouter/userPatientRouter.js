@@ -174,18 +174,17 @@ async function handleAllSubscriptions(req, res, next) {
                 'department',
                 'address',
                 'profileImg',
-                'coverImg'
+                'coverImg',
+                [
+                    Sequelize.literal('(SELECT avg(rating) FROM ratings WHERE ratings.physician = physician.username)'),
+                    'avgRating'
+                ]
             ],
             include: [
                 {
                     model: rating.model,
                     as: 'Rating', // Modify this to match the alias in the association
-                    attributes: [
-                        'rating',
-                        'physician',
-                        'patient',
-                        [Sequelize.literal('(SELECT avg(`rating`) FROM `ratings` WHERE `ratings`.`physician` = `physician`.`username`)'), 'avgRating']
-                    ]
+                    attributes: ['rating', 'physician', 'patient']
                 }
             ]
         });
