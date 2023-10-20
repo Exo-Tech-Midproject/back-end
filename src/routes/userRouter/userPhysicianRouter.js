@@ -499,7 +499,14 @@ async function getOneGroup(req, res, next) {
                 physicianUN: username,
                 id: id
 
-            }
+            },
+            include: [
+                {
+                    model: physician.model,
+                    as: 'Maker',
+                    attributes: ['fullName', 'username', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg', 'nationalID']
+                }
+            ]
         })
 
         if (!groupsFound) throw new Error(`This group doesn't exist`)
