@@ -42,7 +42,7 @@ async function sendResetEmail(emailAddress, resetToken) {
 }
 
 
-const { group, physician, patient, appointment } = require('../../models');
+const { group, physician, patient, appointment, rating } = require('../../models');
 const path = require('path');
 
 generalRouter.get('/', homePageHandler)
@@ -341,13 +341,18 @@ async function handleGetAllPatients(req, res, next) {
 }
 async function handleGetAllPhysicians(req, res, next) {
     try {
-        const userProfile = await physician.model.findAll({
-            attributes: ['fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address'],
-        })
+        const physicians = await physician.model.findAll({
+            attributes: ['username', 'fullName', 'licenseId', 'gender', 'birthDate', 'mobileNumber', 'emailAddress', 'department', 'address', 'profileImg', 'coverImg'],
+        });
 
-        res.status(200).json(userProfile);
+        const physiciansWithAvgRating = await Promise.all(physicians.map(async (physician) => {
+            const averageRating = await rating.model.calculateAverageRating(physician.username);
+            return { ...physician.toJSON(), averageRating };
+        }));
+
+        res.status(200).json(physiciansWithAvgRating);
     } catch (err) {
-        next(err)
+        next(err);
     }
 }
 async function handleGetOnePatient(req, res, next) {
