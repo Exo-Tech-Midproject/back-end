@@ -214,9 +214,9 @@ async function handleAllSubscriptions(req, res, next) {
 async function handleSubscirbePatient(req, res, next) {
     const { username, physicianUN } = req.params
     try {
-        console.log(patientUN, username)
+        // console.log(physicianUN, username)
         let patientName = await patient.getByUN(username)
-        let physicianName = await patient.getByUN(physicianUN)
+        let physicianName = await physician.getByUN(physicianUN)
 
 
 
