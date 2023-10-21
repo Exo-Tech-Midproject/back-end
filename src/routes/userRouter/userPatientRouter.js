@@ -71,6 +71,7 @@ patientRouter.get('/patient/:username/prescriptions/by/:physicianUN', bearerAuth
 // patient Q&A routees
 patientRouter.post('/patient/:username/Q&A', bearerAuthPatient, addQApostByPatient)
 patientRouter.get('/patient/:username/Q&A', bearerAuthPatient, getAllQApostsByPatient)
+patientRouter.get('/patient/:username/Q&A/:id/comments', bearerAuthPatient, getCommentsPatient);
 patientRouter.get('/patient/:username/Q&A/:id', bearerAuthPatient, getOneQApostByPatientbyId)
 patientRouter.put('/patient/:username/Q&A/:id', bearerAuthPatient, updateOneQApostByPatientbyId)
 patientRouter.delete('/patient/:username/Q&A/:id', bearerAuthPatient, deleteOneQApostByPatientbyId)
@@ -735,6 +736,24 @@ async function getAllQApostsByPatient(req, res, next) {
         next(error)
     }
 };
+async function getCommentsPatient(req, res, next) {
+    try {
+        const { username, id } = req.params;
+        //let post = await QuestionAnswer.get(id)
+        let post = await QuestionAnswer.model.findOne({
+            where: { id: id }, include: {
+                model: Comment.model,
+                as: 'Comments'
+            }
+        })
+        if (post) {
+            //let comments = await post.getComments()
+            res.status(200).json(post);
+        } else throw new Error('Post Not Found');
+    } catch (err) {
+        next(err);
+    }
+}
 
 //! get post bt id 
 async function getOneQApostByPatientbyId(req, res, next) {
