@@ -720,6 +720,10 @@ async function getAllQApostsByPatient(req, res, next) {
             const allPosts = await QuestionAnswer.model.findAll({
                 where: {
                     craetedBy: username
+                },
+                include: {
+                    model: Comment.model,
+                    as: 'Comments'
                 }
             });
             if (allPosts[0]) {
