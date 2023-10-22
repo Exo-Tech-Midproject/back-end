@@ -1010,7 +1010,7 @@ async function getAllCreatedRating(req, res, next) {
             }
         });
 
-        if (!allRating[0]) throw new Error(`You don't have Rating yet!`)
+        // if (!allRating[0]) throw new Error(`You don't have Rating yet!`)
 
         res.status(200).json(allRating)
     } catch (err) {
